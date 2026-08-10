@@ -43,7 +43,9 @@ PEGAS_ESSENCE = (
     "оптовые и розничные поставки оригинального охранного оборудования со склада в Атырау, "
     "установка в собственных установочных центрах."
 )
-INSTALL = "https://install.georgiy.bond"
+# install.georgiy.bond здесь намеренно не упоминается: тот сайт про Астану,
+# а Bagyt GPS работает только в Атырау. Любое упоминание другого города
+# размывает геопривязку и сбивает ИИ-поиск. Запрет продублирован в check.py.
 
 # Подтверждение прав в вебмастерах (мета-тег надёжнее файла).
 YANDEX_VERIFY = ""   # значение content из Яндекс.Вебмастера
@@ -264,9 +266,9 @@ def shell(lang, path, title, desc, body, ld):
 <p><a href="tel:{PHONE_HREF}">{PHONE}</a></p>
 <p><a href="{WA}" target="_blank" rel="noopener">WhatsApp</a></p></div>
 <div><h3>Разделы</h3>{foot_links}</div>
-<div><h3>Смежные сайты</h3>
+<div><h3>Смежная компания</h3>
 <p><a href="{PEGAS}" rel="noopener">{PEGAS_NAME} — StarLine в Атырау</a></p>
-<p><a href="{INSTALL}" rel="noopener">Установка StarLine в Астане</a></p></div>
+<p class="sm">Охранные комплексы, видеорегистраторы и услуги СТО в Атырау.</p></div>
 </div></div></footer>
 <a class="fab" href="{WA}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">{WA_ICO}</a>
 </body>

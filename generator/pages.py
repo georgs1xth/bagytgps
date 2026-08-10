@@ -2,7 +2,7 @@
 """Внутренние страницы Bagyt GPS. Никаких фактов сверх подтверждённых Георгием 09.08.2026."""
 from build import (E, SITE, BRAND, PHONE, PHONE_HREF, WA, CITY, REGION, ADDR_STREET, ADDR_NOTE,
                    GEO, HOURS, LEGAL, PLATFORM, PRICE_INSTALL, PRICE_SUB, PEGAS, PEGAS_NAME,
-                   PEGAS_ESSENCE, INSTALL, money, pre, shell, buttons, cta, crumbs, faq_html,
+                   PEGAS_ESSENCE, money, pre, shell, buttons, cta, crumbs, faq_html,
                    links_block, org_ld, webpage_ld, breadcrumb_ld, faq_ld, service_ld,
                    offer_install, offer_sub, graph)
 
@@ -441,8 +441,9 @@ def page_contacts(lang):
 что и «{E(PEGAS_NAME)}». {E(PEGAS_ESSENCE)}</p>
 <p>Мониторинг вынесен в отдельное направление со своим телефоном и своим адресом,
 чтобы задачами автопарков занимались отдельно от розницы и установки сигнализаций.
-Сайт компании: <a href="{PEGAS}" rel="noopener">{E(PEGAS_NAME)}</a>.
-Сайт мастера-установщика в Астане: <a href="{INSTALL}" rel="noopener">install.georgiy.bond</a>.</p>
+Сайт компании: <a href="{PEGAS}" rel="noopener">{E(PEGAS_NAME)}</a>.</p>
+<p>Работаем только по Атырау и Атырауской области: и установка, и обслуживание,
+и разбор вопросов по системе — всё в городе, по адресу {E(ADDR_STREET)}.</p>
 """
     faq = [
         ("Где находится Bagyt GPS в Атырау?",

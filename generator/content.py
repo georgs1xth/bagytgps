@@ -2,7 +2,7 @@
 """Главная страница Bagyt GPS. Факты подтверждены Георгием 09.08.2026."""
 from build import (E, SITE, BRAND, PHONE, PHONE_HREF, WA, CITY, REGION, ADDR_STREET, ADDR_NOTE,
                    HOURS, LEGAL, PLATFORM, PRICE_INSTALL, PRICE_SUB, PEGAS, PEGAS_NAME,
-                   PEGAS_ESSENCE, INSTALL, FOUNDED_PEGAS, money, pre, shell, buttons, cta,
+                   PEGAS_ESSENCE, FOUNDED_PEGAS, money, pre, shell, buttons, cta,
                    faq_html, links_block, org_ld, webpage_ld, faq_ld, graph)
 
 TITLE = "Bagyt GPS — GPS-мониторинг транспорта в Атырау"
