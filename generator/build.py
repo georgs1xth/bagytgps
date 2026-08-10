@@ -239,6 +239,11 @@ def shell(lang, path, title, desc, body, ld):
 <meta name="description" content="{E(desc)}">
 <link rel="canonical" href="{canon}">
 {hre}<link rel="alternate" hreflang="x-default" href="{alts['ru']}">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#101010">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{BRAND}">
 <meta property="og:title" content="{E(title)}">

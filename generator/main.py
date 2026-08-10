@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Сборка сайта Bagyt GPS. Запуск: python3 main.py --out ../public"""
-import argparse, os, sys
+import argparse, json, os, sys
 from build import SITE, LANGS, HL, pre
 from content import page_home
 from pages import all_pages, PATHS as EXTRA
@@ -31,6 +31,21 @@ Sitemap: {SITE}/sitemap.xml
 """
 
 
+MANIFEST = {
+    "name": "Bagyt GPS — GPS-мониторинг транспорта в Атырау",
+    "short_name": "Bagyt GPS",
+    "start_url": "/",
+    "display": "browser",
+    "background_color": "#ffffff",
+    "theme_color": "#101010",
+    "icons": [
+        {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png"},
+        {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png"},
+        {"src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml"},
+    ],
+}
+
+
 def write(out, path, content):
     full = os.path.join(out, path.strip("/"), "index.html")
     os.makedirs(os.path.dirname(full), exist_ok=True)
@@ -49,6 +64,8 @@ def main():
         write(out, path, html_str)
     open(os.path.join(out, "sitemap.xml"), "w", encoding="utf-8").write(sitemap())
     open(os.path.join(out, "robots.txt"), "w", encoding="utf-8").write(ROBOTS)
+    open(os.path.join(out, "site.webmanifest"), "w", encoding="utf-8").write(
+        json.dumps(MANIFEST, ensure_ascii=False, indent=2))
     print(f"OK: {len(pages)} страниц + sitemap.xml + robots.txt → {out}")
     return 0
 
