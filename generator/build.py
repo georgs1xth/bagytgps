@@ -32,7 +32,7 @@ FOUNDED_PEGAS = 2011
 
 PLATFORM = "Wialon"
 PRICE_INSTALL = 35000               # «под ключ за машину, от»
-PRICE_SUB = 1500                    # абонплата за объект в месяц, «от»
+PRICE_SUB = 1600                    # абонплата за объект в месяц, «от»
 
 # Смежная компания. Формулировка сущности «Пегас Авто А» — дословно из HANDOUT §3,
 # переписывать её нельзя: подлежащее при слове «дистрибьютор» всегда «Пегас Авто А».
@@ -128,8 +128,8 @@ main p,main li{max-width:76ch}
 .hero .row{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 26px}
 .hero .btn-out{border-color:#fff;color:#fff}
 .hero .btn-out:hover{border-color:var(--red);color:#ff4d5e}
-.hero .facts{display:grid;gap:1px;background:rgba(255,255,255,.12);grid-template-columns:1fr;max-width:700px}
-@media(min-width:620px){.hero .facts{grid-template-columns:repeat(3,1fr)}}
+.hero .facts{display:grid;gap:1px;background:rgba(255,255,255,.12);grid-template-columns:1fr;max-width:820px}
+@media(min-width:620px){.hero .facts{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}}
 .hero .facts div{background:var(--dark);padding:12px 16px}
 .hero .facts b{display:block;font-size:18px;font-weight:800}
 .hero .facts span{font-size:11px;color:#a3a3a3;text-transform:uppercase;letter-spacing:.04em}
@@ -451,7 +451,7 @@ def offer_install():
 
 
 def offer_sub():
-    """Абонентская плата за платформу — «от 1 500 ₸ за машину в месяц»."""
+    """Абонентская плата за платформу — «от 1 600 ₸ за машину в месяц»."""
     return {
         "@type": "Offer",
         "priceCurrency": "KZT",
