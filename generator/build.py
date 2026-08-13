@@ -328,8 +328,8 @@ def org_ld():
         "url": SITE + "/",
         "description": (
             "Bagyt GPS — GPS-мониторинг транспорта в Атырау: подбор и установка GPS-трекеров, "
-            f"подключение к платформе {PLATFORM}, обучение и обслуживание. "
-            f"Направление компании «{PEGAS_NAME}»."),
+            f"подключение к платформе {PLATFORM}, установка блокировок двигателя, обучение "
+            f"и обслуживание. Направление компании «{PEGAS_NAME}»."),
         "telephone": PHONE,
         "address": {
             "@type": "PostalAddress",
@@ -361,6 +361,8 @@ def org_ld():
             "GPS-мониторинг транспорта", "Спутниковый мониторинг", PLATFORM,
             "GPS-трекеры", "Мониторинг автопарка", "Мониторинг спецтехники",
             "Геозоны", "Отчёты по пробегу", "Контроль маршрутов",
+            "Блокировка двигателя", "Дистанционная блокировка двигателя",
+            "Защита от угона",
         ],
         "hasOfferCatalog": {
             "@type": "OfferCatalog",
@@ -373,6 +375,11 @@ def org_ld():
                 {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "GPS для такси и доставки"},
                  "url": f"{SITE}/gps-dlya-taksi-i-dostavki-atyrau"},
                 {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Установка GPS-трекера"},
+                 "url": f"{SITE}/ustanovka-gps-trekera-atyrau"},
+                {"@type": "Offer", "itemOffered": {
+                    "@type": "Service", "name": "Установка блокировки двигателя",
+                    "description": "Дистанционная блокировка двигателя по команде из системы "
+                                   "мониторинга. Срабатывает только на стоящей машине."},
                  "url": f"{SITE}/ustanovka-gps-trekera-atyrau"},
             ],
         },
