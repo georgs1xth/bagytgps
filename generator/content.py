@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """Главная страница Bagyt GPS. Факты подтверждены Георгием 09.08.2026."""
 from build import (E, SITE, BRAND, PHONE, PHONE_HREF, WA, CITY, REGION, ADDR_STREET, ADDR_NOTE,
-                   HOURS, LEGAL, PLATFORM, PRICE_INSTALL, PRICE_SUB, PEGAS, PEGAS_NAME,
-                   PEGAS_ESSENCE, FOUNDED_PEGAS, money, pre, shell, buttons, cta,
-                   faq_html, links_block, org_ld, webpage_ld, faq_ld, graph)
+                   HOURS, LEGAL, PLATFORM, PRICE_INSTALL, PRICE_SUB, PRICE_SUB_YEAR,
+                   PEGAS, PEGAS_NAME, PEGAS_ESSENCE, FOUNDED_PEGAS, money, sub_text,
+                   pre, shell, buttons, cta, faq_html, links_block, org_ld, webpage_ld,
+                   faq_ld, graph)
 
 TITLE = "Bagyt GPS — GPS-мониторинг транспорта в Атырау"
-DESC = (f"GPS-мониторинг транспорта в Атырау: установка трекеров под ключ от {money(PRICE_INSTALL)}, "
-        f"платформа {PLATFORM} от {money(PRICE_SUB)} за машину в месяц. Автопарки, спецтехника, такси.")
+DESC = (f"GPS-мониторинг транспорта в Атырау: трекер с установкой от {money(PRICE_INSTALL)}, "
+        f"платформа {PLATFORM} — {money(PRICE_SUB)} в месяц за машину или {money(PRICE_SUB_YEAR)} "
+        "при оплате за год.")
 
 # Что реально даёт базовый мониторинг. Ничего сверх этого не обещаем.
 WHAT = [
@@ -61,12 +63,16 @@ STEPS = [
 
 FAQ = [
     ("Сколько стоит GPS-мониторинг в Атырау?",
-     f"В Bagyt GPS установка под ключ стоит от {money(PRICE_INSTALL)} за машину — это оборудование "
-     f"и работа вместе. Дальше платформа {PLATFORM} — от {money(PRICE_SUB)} за машину в месяц. "
+     f"В Bagyt GPS трекер с установкой под ключ стоит от {money(PRICE_INSTALL)} за машину — это "
+     f"оборудование и работа вместе, платится один раз. Дальше платформа {PLATFORM}: {sub_text()}. "
      "Точную сумму называем после того, как узнаем количество машин и тип техники."),
     ("Что входит в абонентскую плату?",
      f"Доступ к платформе {PLATFORM} для вашего парка: карта в реальном времени, треки за прошедшие дни, "
      "пробег, геозоны, отчёты и учётные записи для сотрудников. Оплата считается за каждую машину."),
+    ("Почему две цены на абонплату?",
+     f"Это одна и та же услуга, разница только в способе оплаты. Помесячно — {money(PRICE_SUB)} "
+     f"за машину. Если оплачиваете сразу за год, выходит {money(PRICE_SUB_YEAR)} за машину в месяц. "
+     "Никаких ограничений по функциям во втором случае нет, просто дешевле."),
     ("На какой платформе работает мониторинг?",
      f"На {PLATFORM} — это система спутникового мониторинга, которой пользуются автопарки по всему Казахстану. "
      "Заходить можно и с компьютера, и с телефона."),
@@ -104,7 +110,7 @@ def page_home(lang="ru"):
     # ежемесячно. Показывать только абонплату — значит вводить в заблуждение.
     facts = "".join(f"<div><b>{E(b)}</b><span>{E(s)}</span></div>" for b, s in [
         (f"от {money(PRICE_INSTALL)}", "трекер с установкой"),
-        (f"от {money(PRICE_SUB)}", "за машину в месяц"),
+        (f"{money(PRICE_SUB_YEAR)} – {money(PRICE_SUB)}", "за машину в месяц"),
         (PLATFORM, "платформа мониторинга"),
         (CITY, "установка и поддержка на месте"),
     ])
@@ -160,8 +166,10 @@ def page_home(lang="ru"):
 <tr><th>Что</th><th>Стоимость</th><th>Как считается</th></tr>
 <tr><td>Трекер с установкой под ключ</td><td><b>от {E(money(PRICE_INSTALL))}</b> за машину</td>
     <td>Само оборудование и работа вместе. Платится один раз.</td></tr>
-<tr><td>Платформа {E(PLATFORM)}</td><td><b>от {E(money(PRICE_SUB))}</b> за машину в месяц</td>
+<tr><td>Платформа {E(PLATFORM)}, помесячно</td><td><b>{E(money(PRICE_SUB))}</b> за машину в месяц</td>
     <td>Абонентская плата за доступ к системе.</td></tr>
+<tr><td>Платформа {E(PLATFORM)}, оплата за год</td><td><b>{E(money(PRICE_SUB_YEAR))}</b> за машину в месяц</td>
+    <td>То же самое, но дешевле: год оплачивается сразу.</td></tr>
 </table></div>
 <p>Точную сумму называем до начала работ — после того, как узнаем количество машин и тип техники.
 Подробный расчёт — на странице <a href="{(pre(lang) + '/ceny').rstrip('/')}">цен</a>.</p>

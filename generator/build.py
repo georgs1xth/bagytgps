@@ -32,7 +32,8 @@ FOUNDED_PEGAS = 2011
 
 PLATFORM = "Wialon"
 PRICE_INSTALL = 35000               # «под ключ за машину, от»
-PRICE_SUB = 1600                    # абонплата за объект в месяц, «от»
+PRICE_SUB = 2100                    # абонплата за объект в месяц при помесячной оплате
+PRICE_SUB_YEAR = 1600               # то же в месяц, но при оплате сразу за год
 
 # Смежная компания. Формулировка сущности «Пегас Авто А» — дословно из HANDOUT §3,
 # переписывать её нельзя: подлежащее при слове «дистрибьютор» всегда «Пегас Авто А».
@@ -64,6 +65,15 @@ def pre(lang):
 
 def money(n):
     return f"{n:,}".replace(",", " ") + " ₸"
+
+
+def sub_text(short=False):
+    """Абонплата всегда называется двумя числами сразу.
+    Показать только 1 600 ₸ без условия — обман: столько стоит лишь при оплате за год."""
+    if short:
+        return f"{money(PRICE_SUB)} в месяц, {money(PRICE_SUB_YEAR)} при оплате за год"
+    return (f"{money(PRICE_SUB)} за машину в месяц, "
+            f"а при оплате сразу за год — {money(PRICE_SUB_YEAR)} в месяц")
 
 
 # ── Навигация ────────────────────────────────────────────────────────────────
@@ -458,22 +468,27 @@ def offer_install():
 
 
 def offer_sub():
-    """Абонентская плата за платформу — «от 1 600 ₸ за машину в месяц»."""
-    return {
-        "@type": "Offer",
-        "priceCurrency": "KZT",
-        "priceSpecification": {
-            "@type": "UnitPriceSpecification",
+    """Абонентская плата — два варианта оплаты, поэтому два Offer, а не один «от».
+    Одним узлом это не выразить: 1 600 ₸ действуют только при оплате за год."""
+    def one(name, price, months):
+        return {
+            "@type": "Offer",
+            "name": name,
             "priceCurrency": "KZT",
-            "minPrice": PRICE_SUB,
-            "unitText": "машина в месяц",
-            "billingDuration": 1,
-            "billingIncrement": 1,
-            "unitCode": "MON",
-        },
-        "availability": "https://schema.org/InStock",
-        "seller": {"@id": f"{SITE}/#org"},
-    }
+            "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "priceCurrency": "KZT",
+                "price": price,
+                "unitText": "машина в месяц",
+                "billingDuration": months,
+                "billingIncrement": 1,
+                "unitCode": "MON",
+            },
+            "availability": "https://schema.org/InStock",
+            "seller": {"@id": f"{SITE}/#org"},
+        }
+    return [one("Помесячная оплата", PRICE_SUB, 1),
+            one("Оплата за год", PRICE_SUB_YEAR, 12)]
 
 
 def graph(*nodes):
