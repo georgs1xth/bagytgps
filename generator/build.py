@@ -31,9 +31,10 @@ LEGAL = "ИП «JASavto»"
 FOUNDED_PEGAS = 2011
 
 PLATFORM = "Wialon"
-PRICE_INSTALL = 35000               # «под ключ за машину, от»
-PRICE_SUB = 2100                    # абонплата за объект в месяц при помесячной оплате
-PRICE_SUB_YEAR = 1600               # то же в месяц, но при оплате сразу за год
+PRICE_INSTALL = 35000               # трекер с установкой под ключ, «от»
+PRICE_SUB = 2500                    # абонплата за объект в месяц при помесячной оплате
+PRICE_SUB_YEAR = 1900               # то же в месяц, но при оплате сразу за год
+PRICE_BLOCK = 12000                 # блокировка двигателя, «от», ставится вместе с трекером
 
 # Смежная компания. Формулировка сущности «Пегас Авто А» — дословно из HANDOUT §3,
 # переписывать её нельзя: подлежащее при слове «дистрибьютор» всегда «Пегас Авто А».
@@ -390,6 +391,9 @@ def org_ld():
                     "@type": "Service", "name": "Установка блокировки двигателя",
                     "description": "Дистанционная блокировка двигателя по команде из системы "
                                    "мониторинга. Срабатывает только на стоящей машине."},
+                 "priceCurrency": "KZT",
+                 "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "KZT",
+                                        "minPrice": PRICE_BLOCK, "valueAddedTaxIncluded": True},
                  "url": f"{SITE}/ustanovka-gps-trekera-atyrau"},
             ],
         },
