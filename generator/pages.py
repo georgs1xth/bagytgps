@@ -3,7 +3,7 @@
 from build import (E, SITE, BRAND, PHONE, PHONE_HREF, WA, CITY, REGION, ADDR_STREET, ADDR_NOTE,
                    GEO, HOURS, LEGAL, PLATFORM, PRICE_INSTALL, PRICE_SUB, PRICE_SUB_YEAR, PRICE_BLOCK, PEGAS, PEGAS_NAME,
                    PEGAS_ESSENCE, money, sub_text, pre, shell, buttons, cta, crumbs, faq_html,
-                   PRICE_RENT_UP, PRICE_RENT_SUB, RENT_TERM, MARKET_INSTALL, MARKET_SUB, MARKET_DATE,
+                   MARKET_INSTALL, MARKET_SUB, MARKET_DATE,
                    links_block, org_ld, webpage_ld, breadcrumb_ld, faq_ld, service_ld,
                    offer_install, offer_sub, graph)
 
@@ -409,8 +409,6 @@ def calculator():
   <b>Ежемесячно</b><em>%(iu)s за машину при установке, дальше %(sm)s в месяц</em></span></label>
 <label><input type="radio" name="ct" value="year"><span>
   <b>Сразу за год</b><em>%(iu)s при установке и год вперёд по %(sy)s в месяц</em></span></label>
-<label><input type="radio" name="ct" value="rent"><span>
-  <b>Аренда</b><em>%(ru)s взнос, дальше %(rs)s в месяц. Трекер остаётся наш, срок от %(rt)d месяцев</em></span></label>
 </div>
 </div>
 
@@ -426,7 +424,7 @@ def calculator():
 <svg id="cc" viewBox="0 0 640 260" role="img" aria-label="График расходов за первый год"></svg>
 <div class="lg">
 <span><i style="background:#e30016"></i><b id="lg1">Ваш вариант</b></span>
-<span><i style="background:#9a9a9a"></i>Другие наши варианты</span>
+<span><i style="background:#9a9a9a"></i>Второй наш тариф</span>
 <span><i style="background:#101010"></i>Типичная цена по рынку</span>
 </div>
 </figure>
@@ -439,32 +437,44 @@ def calculator():
 
 <script>
 (function(){
- var T={month:{up:%(IU)d,pre:0,mo:%(SM)d},year:{up:%(IU)d,pre:%(SYY)d,mo:0},rent:{up:%(RU)d,pre:0,mo:%(RS)d}},
+ var T={month:{up:%(IU)d,pre:0,mo:%(SM)d},year:{up:%(IU)d,pre:%(SYY)d,mo:0}},
      M={up:%(MI)d,pre:0,mo:%(MS)d},
-     NM={month:"Ежемесячно",year:"Сразу за год",rent:"Аренда"},
+     NM={month:"Ежемесячно",year:"Сразу за год"},
      q=document.getElementById("cq"),r=document.getElementById("cr"),NB="\u00a0";
  function f(v){return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g,NB)+NB+"\u20b8"}
  function cum(t,n,m){return (t.up+t.pre+t.mo*m)*n}
  function cur(){var e=document.querySelector("input[name=ct]:checked");return e?e.value:"month"}
  function draw(n,k){
-  var W=640,H=260,L=56,R=10,TP=12,BT=30,pw=W-L-R,ph=H-TP-BT,
-      ser=[["month",T.month],["year",T.year],["rent",T.rent]],
+  var el=document.getElementById("cc"),
+      W=Math.round((el.parentNode&&el.parentNode.clientWidth)||el.clientWidth||640);
+  if(W<240){W=240;}
+  // viewBox приравнен к реальной ширине: одна единица = один CSS-пиксель,
+  // поэтому шрифт 11 остаётся 11 и на телефоне, а не ужимается вместе с картинкой.
+  var nar=W<430,H=nar?230:260,
+      L=nar?2:56,R=nar?8:10,TP=nar?18:12,BT=26,
+      gl=nar?3:4,xs=nar?6:3,
+      pw=W-L-R,ph=H-TP-BT,
+      ser=[["month",T.month],["year",T.year]],
       max=Math.max(cum(M,n,12),Math.max.apply(null,ser.map(function(s){return cum(s[1],n,12)})))*1.06,
       X=function(m){return L+pw*m/12},
       Y=function(v){return TP+ph-ph*v/max},
-      pa=function(t){var d="",m;for(m=0;m<=12;m++){d+=(m?"L":"M")+X(m).toFixed(1)+" "+Y(cum(t,n,m)).toFixed(1)}return d},
+      lab=function(v){return v>=1e6?(v/1e6).toFixed(1).replace(".",",")+"\u00a0млн":Math.round(v/1000)+"\u00a0тыс"},
+      pa=function(t){var d="",m;for(m=0;m<=12;m++){d+=(m?"L":"M")+X(m).toFixed(1)+" "+Y(cum(t,n,m)).toFixed(1);}return d;},
       o=[],g,y;
-  for(g=0;g<=4;g++){y=TP+ph-ph*g/4;
+  el.setAttribute("viewBox","0 0 "+W+" "+H);
+  for(g=0;g<=gl;g++){y=TP+ph-ph*g/gl;
    o.push('<line x1="'+L+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'" stroke="#e6e6e6"/>');
-   o.push('<text x="'+(L-8)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="#6f6f6f">'+
-     Math.round(max*g/4/1000)+'\u00a0тыс</text>');}
-  for(g=0;g<=12;g+=3){o.push('<text x="'+X(g).toFixed(1)+'" y="'+(H-9)+'" text-anchor="middle" font-size="11" fill="#6f6f6f">'+
-    (g?g+'\u00a0мес':'старт')+'</text>');}
+   // На узком экране подпись ставим НАД линией слева, иначе поле под неё съедает треть графика.
+   o.push(nar
+     ? '<text x="0" y="'+(y-5).toFixed(1)+'" font-size="11" fill="#6f6f6f">'+lab(max*g/gl)+'</text>'
+     : '<text x="'+(L-8)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="#6f6f6f">'+lab(max*g/gl)+'</text>');}
+  for(g=0;g<=12;g+=xs){o.push('<text x="'+X(g).toFixed(1)+'" y="'+(H-7)+'" text-anchor="'+
+    (g===0?"start":g===12?"end":"middle")+'" font-size="11" fill="#6f6f6f">'+(g?g+'\u00a0мес':'старт')+'</text>');}
   o.push('<path d="'+pa(M)+'" fill="none" stroke="#101010" stroke-width="2" stroke-dasharray="5 4"/>');
   ser.forEach(function(s){if(s[0]!==k){o.push('<path d="'+pa(s[1])+'" fill="none" stroke="#9a9a9a" stroke-width="1.5"/>');}});
   o.push('<path d="'+pa(T[k])+'" fill="none" stroke="#e30016" stroke-width="3"/>');
   o.push('<circle cx="'+X(12).toFixed(1)+'" cy="'+Y(cum(T[k],n,12)).toFixed(1)+'" r="4.5" fill="#e30016"/>');
-  document.getElementById("cc").innerHTML=o.join("");
+  el.innerHTML=o.join("");
  }
  function upd(){
   var n=Math.max(1,Math.min(100,parseInt(q.value,10)||1)),k=cur(),t=T[k],
@@ -478,6 +488,7 @@ def calculator():
   document.getElementById("lg1").textContent=NM[k];
   draw(n,k);
  }
+ var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(upd,150);});
  q.addEventListener("input",upd);
  r.addEventListener("input",function(){q.value=r.value;upd();});
  Array.prototype.forEach.call(document.querySelectorAll("input[name=ct]"),function(e){e.addEventListener("change",upd);});
@@ -487,10 +498,8 @@ def calculator():
 """
     return html % {
         "iu": money(PRICE_INSTALL), "sm": money(PRICE_SUB), "sy": money(PRICE_SUB_YEAR),
-        "ru": money(PRICE_RENT_UP), "rs": money(PRICE_RENT_SUB), "rt": RENT_TERM,
         "mi": money(MARKET_INSTALL), "ms": money(MARKET_SUB), "md": MARKET_DATE,
         "IU": PRICE_INSTALL, "SM": PRICE_SUB, "SYY": PRICE_SUB_YEAR * 12,
-        "RU": PRICE_RENT_UP, "RS": PRICE_RENT_SUB,
         "MI": MARKET_INSTALL, "MS": MARKET_SUB,
     }
 
@@ -500,12 +509,12 @@ def page_prices(lang):
     path = "/ceny"
     title = "Цены и калькулятор GPS-мониторинга в Атырау — Bagyt GPS"
     desc = (f"Калькулятор GPS-мониторинга в Атырау: установка от {money(PRICE_INSTALL)}, платформа "
-            f"{money(PRICE_SUB)} в месяц или {money(PRICE_SUB_YEAR)} за год. Аренда — от {money(PRICE_RENT_UP)}.")
+            f"{money(PRICE_SUB)} в месяц за машину или {money(PRICE_SUB_YEAR)} при оплате за год.")
     body = f"""
 <p class="lead">Платить придётся дважды, и мы говорим об этом сразу. Первый раз —
 за сам трекер вместе с установкой, это разово. Второй — за доступ к платформе,
-помесячно или сразу за год со скидкой. Есть и третий вариант — аренда, когда трекер
-остаётся нашим, а вы платите меньше на старте. Посчитайте свой парк.</p>
+помесячно или сразу за год со скидкой. Посчитайте свой парк — калькулятор покажет обе схемы
+и сравнит их с типичной ценой по рынку.</p>
 
 {calculator()}
 
@@ -522,10 +531,6 @@ def page_prices(lang):
 <tr><td>Платформа {E(PLATFORM)}, оплата за год</td><td><b>{E(money(PRICE_SUB_YEAR))}</b> за машину в месяц</td><td>Раз в год</td>
     <td>То же самое и в том же объёме, вместе с SIM-картой и интернетом.
     Дешевле, потому что год оплачивается сразу.</td></tr>
-<tr><td>Аренда: стартовый взнос</td><td><b>{E(money(PRICE_RENT_UP))}</b> за машину</td><td>Один раз</td>
-    <td>Альтернатива покупке. Трекер остаётся нашей собственностью, при расторжении снимается.</td></tr>
-<tr><td>Аренда: ежемесячный платёж</td><td><b>{E(money(PRICE_RENT_SUB))}</b> за машину</td><td>Ежемесячно</td>
-    <td>Оборудование, платформа, SIM-карта и интернет в одном платеже. Минимальный срок — {RENT_TERM} месяца.</td></tr>
 <tr><td>Блокировка двигателя</td><td><b>от {E(money(PRICE_BLOCK))}</b> за машину</td><td>Один раз</td>
     <td>По желанию. Реле, скрытый монтаж, управление из системы мониторинга.</td></tr>
 </table></div>
@@ -545,16 +550,6 @@ def page_prices(lang):
 машин и тип техники. Напишите в WhatsApp, сколько у вас единиц — посчитаем и ответим цифрой,
 а не диапазоном.</p></div>
 
-<h2>Аренда вместо покупки</h2>
-<p>Если {E(money(PRICE_INSTALL))} на старте — это неудобно, трекер можно арендовать: вы платите
-{E(money(PRICE_RENT_UP))} взноса и дальше {E(money(PRICE_RENT_SUB))} в месяц за машину. В этот платёж
-входит всё: само оборудование, платформа, SIM-карта и связь.</p>
-<p>Два условия, о которых мы говорим сразу, а не мелким шрифтом. <b>Трекер остаётся нашей
-собственностью</b> — при расторжении договора мы его снимаем. И <b>минимальный срок — {RENT_TERM} месяца</b>:
-на более коротком сроке схема не окупается, поэтому мы её не предлагаем.</p>
-<p>За два года аренда выходит примерно в ту же сумму, что покупка. Разница не в деньгах,
-а в том, когда вы их отдаёте.</p>
-
 <h2>Как оплачивается</h2>
 <p>Трекер вместе с установкой оплачивается один раз, при сдаче машины, и остаётся вашим.
 Платформа — по количеству машин в системе: либо ежемесячно, либо сразу за год,
@@ -570,16 +565,6 @@ def page_prices(lang):
          f"Это одна и та же услуга, разница только в способе оплаты. Помесячно — {money(PRICE_SUB)} "
          f"за машину. Если оплачиваете год сразу, выходит {money(PRICE_SUB_YEAR)} за машину в месяц. "
          "Функции при этом одинаковые, ничего не урезается."),
-        ("Можно взять трекер в аренду, а не покупать?",
-         f"Да. Стартовый взнос {money(PRICE_RENT_UP)} за машину, дальше {money(PRICE_RENT_SUB)} в месяц — "
-         "в этот платёж входит оборудование, платформа, SIM-карта и связь. Трекер при этом остаётся "
-         f"нашей собственностью, минимальный срок — {RENT_TERM} месяца. За два года выходит примерно "
-         "та же сумма, что при покупке: разница в том, когда вы отдаёте деньги, а не в размере."),
-        ("Что выгоднее — купить или арендовать?",
-         f"На горизонте двух лет разница небольшая. Покупка дешевле в сумме, но требует "
-         f"{money(PRICE_INSTALL)} сразу. Аренда снижает старт до {money(PRICE_RENT_UP)}, но каждый месяц "
-         "дороже. Если деньги на старте есть — берите покупку, трекер сразу ваш. Если важнее не вынимать "
-         "сумму из оборота — аренду. Посчитайте оба варианта в калькуляторе выше."),
         ("Почему цена указана «от»?",
          "Потому что стоимость зависит от типа техники и количества машин. Легковая машина, грузовик "
          "и спецтехника требуют разного оборудования и разного объёма работ. Мы считаем по вашему парку "
