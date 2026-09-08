@@ -3,7 +3,7 @@
 from build import (E, SITE, BRAND, PHONE, PHONE_HREF, WA, CITY, REGION, ADDR_STREET, ADDR_NOTE,
                    GEO, HOURS, LEGAL, PLATFORM, PRICE_INSTALL, PRICE_SUB, PRICE_SUB_YEAR, PRICE_BLOCK, PEGAS, PEGAS_NAME,
                    PEGAS_ESSENCE, money, sub_text, pre, shell, buttons, cta, crumbs, faq_html,
-                   MARKET_INSTALL, MARKET_SUB, MARKET_DATE,
+                   MARKET_INSTALL, MARKET_SUB, MARKET_BLOCK, MARKET_DATE,
                    links_block, org_ld, webpage_ld, breadcrumb_ld, faq_ld, service_ld,
                    offer_install, offer_sub, graph)
 
@@ -412,6 +412,13 @@ def calculator():
 </div>
 </div>
 
+<div class="fld">
+<span style="font-weight:700;display:block;margin-bottom:8px">Дополнительно</span>
+<label class="add"><input type="checkbox" id="cb"><b>Блокировка двигателя, от %(pb)s за машину</b>
+<em>Ставится вместе с трекером, платится один раз. Команда подаётся из системы мониторинга;
+срабатывает только на стоящей машине.</em></label>
+</div>
+
 <div class="out">
 <div><b id="o1">&mdash;</b><span>Заплатите сегодня</span></div>
 <div><b id="o2">&mdash;</b><span>Дальше в месяц</span></div>
@@ -431,18 +438,19 @@ def calculator():
 
 <p class="sm mut" style="margin:14px 0 0">Расчёт предварительный и офертой не является: итог зависит
 от типа техники и условий монтажа. Для сравнения взято реальное предложение другого подрядчика
-в Атырау, %(md)s — %(mi)s за установку и %(ms)s в месяц за машину. Точную сумму по вашему парку
+в Атырау, %(md)s — %(mi)s за установку и %(ms)s в месяц за машину, блокировка у них %(mb)s. Точную сумму по вашему парку
 называем до начала работ.</p>
 </div>
 
 <script>
 (function(){
  var T={month:{up:%(IU)d,pre:0,mo:%(SM)d},year:{up:%(IU)d,pre:%(SYY)d,mo:0}},
-     M={up:%(MI)d,pre:0,mo:%(MS)d},
+     M={up:%(MI)d,pre:0,mo:%(MS)d},B=%(PB)d,MB=%(MPB)d,
      NM={month:"Ежемесячно",year:"Сразу за год"},
      q=document.getElementById("cq"),r=document.getElementById("cr"),NB="\u00a0";
  function f(v){return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g,NB)+NB+"\u20b8"}
- function cum(t,n,m){return (t.up+t.pre+t.mo*m)*n}
+ function cum(t,n,m,x){return (t.up+t.pre+t.mo*m+(x||0))*n}
+ function bl(){var e=document.getElementById("cb");return e&&e.checked;}
  function cur(){var e=document.querySelector("input[name=ct]:checked");return e?e.value:"month"}
  function draw(n,k){
   var el=document.getElementById("cc"),
@@ -455,11 +463,12 @@ def calculator():
       gl=nar?3:4,xs=nar?6:3,
       pw=W-L-R,ph=H-TP-BT,
       ser=[["month",T.month],["year",T.year]],
-      max=Math.max(cum(M,n,12),Math.max.apply(null,ser.map(function(s){return cum(s[1],n,12)})))*1.06,
+      xb=bl()?B:0,xm=bl()?MB:0,
+      max=Math.max(cum(M,n,12,xm),Math.max.apply(null,ser.map(function(s){return cum(s[1],n,12,xb)})))*1.06,
       X=function(m){return L+pw*m/12},
       Y=function(v){return TP+ph-ph*v/max},
       lab=function(v){return v>=1e6?(v/1e6).toFixed(1).replace(".",",")+"\u00a0млн":Math.round(v/1000)+"\u00a0тыс"},
-      pa=function(t){var d="",m;for(m=0;m<=12;m++){d+=(m?"L":"M")+X(m).toFixed(1)+" "+Y(cum(t,n,m)).toFixed(1);}return d;},
+      pa=function(t,x){var d="",m;for(m=0;m<=12;m++){d+=(m?"L":"M")+X(m).toFixed(1)+" "+Y(cum(t,n,m,x)).toFixed(1);}return d;},
       o=[],g,y;
   el.setAttribute("viewBox","0 0 "+W+" "+H);
   for(g=0;g<=gl;g++){y=TP+ph-ph*g/gl;
@@ -470,17 +479,18 @@ def calculator():
      : '<text x="'+(L-8)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="#6f6f6f">'+lab(max*g/gl)+'</text>');}
   for(g=0;g<=12;g+=xs){o.push('<text x="'+X(g).toFixed(1)+'" y="'+(H-7)+'" text-anchor="'+
     (g===0?"start":g===12?"end":"middle")+'" font-size="11" fill="#6f6f6f">'+(g?g+'\u00a0мес':'старт')+'</text>');}
-  o.push('<path d="'+pa(M)+'" fill="none" stroke="#101010" stroke-width="2" stroke-dasharray="5 4"/>');
-  ser.forEach(function(s){if(s[0]!==k){o.push('<path d="'+pa(s[1])+'" fill="none" stroke="#9a9a9a" stroke-width="1.5"/>');}});
-  o.push('<path d="'+pa(T[k])+'" fill="none" stroke="#e30016" stroke-width="3"/>');
-  o.push('<circle cx="'+X(12).toFixed(1)+'" cy="'+Y(cum(T[k],n,12)).toFixed(1)+'" r="4.5" fill="#e30016"/>');
+  o.push('<path d="'+pa(M,xm)+'" fill="none" stroke="#101010" stroke-width="2" stroke-dasharray="5 4"/>');
+  ser.forEach(function(s){if(s[0]!==k){o.push('<path d="'+pa(s[1],xb)+'" fill="none" stroke="#9a9a9a" stroke-width="1.5"/>');}});
+  o.push('<path d="'+pa(T[k],xb)+'" fill="none" stroke="#e30016" stroke-width="3"/>');
+  o.push('<circle cx="'+X(12).toFixed(1)+'" cy="'+Y(cum(T[k],n,12,xb)).toFixed(1)+'" r="4.5" fill="#e30016"/>');
   el.innerHTML=o.join("");
  }
  function upd(){
   var n=Math.max(1,Math.min(100,parseInt(q.value,10)||1)),k=cur(),t=T[k],
-      y1=cum(t,n,12),d=cum(M,n,12)-y1;
+      xb=bl()?B:0,xm=bl()?MB:0,
+      y1=cum(t,n,12,xb),d=cum(M,n,12,xm)-y1;
   q.value=n;r.value=n;
-  document.getElementById("o1").textContent=f((t.up+t.pre)*n);
+  document.getElementById("o1").textContent=f((t.up+t.pre+xb)*n);
   document.getElementById("o2").textContent=t.mo?f(t.mo*n):"0"+NB+"\u20b8";
   document.getElementById("o3").textContent=f(y1);
   document.getElementById("o4").textContent=f(Math.abs(d));
@@ -492,6 +502,7 @@ def calculator():
  q.addEventListener("input",upd);
  r.addEventListener("input",function(){q.value=r.value;upd();});
  Array.prototype.forEach.call(document.querySelectorAll("input[name=ct]"),function(e){e.addEventListener("change",upd);});
+ document.getElementById("cb").addEventListener("change",upd);
  upd();
 })();
 </script>
@@ -499,6 +510,7 @@ def calculator():
     return html % {
         "iu": money(PRICE_INSTALL), "sm": money(PRICE_SUB), "sy": money(PRICE_SUB_YEAR),
         "mi": money(MARKET_INSTALL), "ms": money(MARKET_SUB), "md": MARKET_DATE,
+        "pb": money(PRICE_BLOCK), "PB": PRICE_BLOCK, "MPB": MARKET_BLOCK, "mb": money(MARKET_BLOCK),
         "IU": PRICE_INSTALL, "SM": PRICE_SUB, "SYY": PRICE_SUB_YEAR * 12,
         "MI": MARKET_INSTALL, "MS": MARKET_SUB,
     }

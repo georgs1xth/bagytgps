@@ -76,6 +76,7 @@ def money(n):
 # взяты намеренно как НИЖНЯЯ граница рынка: сравнение должно быть в нашу невыгоду.
 MARKET_INSTALL = 40000
 MARKET_SUB = 3000
+MARKET_BLOCK = 15000   # блокировка у того же подрядчика — против наших 12 000
 MARKET_DATE = "август 2026"
 
 
@@ -215,6 +216,12 @@ th{background:var(--soft);font-weight:700;border-bottom:2px solid var(--red)}
 .calc .tar label:has(input:checked){border-left-color:var(--red);background:var(--soft);border-color:var(--dark)}
 .calc .tar b{display:block;font-size:15px;margin-bottom:2px}
 .calc .tar em{display:block;font-style:normal;font-size:13px;color:var(--mut);line-height:1.45}
+.calc .add{display:block;border:1px solid var(--line);border-left:3px solid var(--line);padding:11px 13px;cursor:pointer;transition:border-color .15s,background .15s}
+.calc .add:hover{background:var(--soft)}
+.calc .add:has(input:checked){border-left-color:var(--red);background:var(--soft);border-color:var(--dark)}
+.calc .add input{width:17px;height:17px;accent-color:var(--red);vertical-align:-3px;margin-right:9px}
+.calc .add b{font-size:15px}
+.calc .add em{display:block;font-style:normal;font-size:13px;color:var(--mut);margin:2px 0 0 26px;line-height:1.45}
 .calc .out{display:grid;gap:1px;background:var(--line);grid-template-columns:repeat(2,1fr);margin:16px 0 0}
 @media(min-width:760px){.calc .out{grid-template-columns:repeat(4,1fr)}}
 .calc .out div{background:var(--bg);padding:12px 14px}
@@ -233,6 +240,7 @@ th{background:var(--soft);font-weight:700;border-bottom:2px solid var(--red)}
   .calc input[type=number]{width:86px;font-size:17px}
   .calc input[type=range]{min-width:140px}
   .calc .lg{gap:8px 14px;font-size:12px}
+  .calc .add b{font-size:14px}
 }
 .stripe{height:10px;background:repeating-linear-gradient(135deg,var(--dark) 0 26px,var(--red) 26px 40px);margin-top:40px}
 footer.site{background:var(--dark);color:#b9b9b9;padding:28px 0;font-size:14px}
