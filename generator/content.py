@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Главная страница Bagyt GPS. Факты подтверждены Георгием 09.08.2026."""
-from build import (E, SITE, BRAND, PHONE, PHONE_HREF, WA, CITY, REGION, ADDR_STREET, ADDR_NOTE,
+from build import (WA_ICO, E, SITE, BRAND, PHONE, PHONE_HREF, WA, CITY, REGION, ADDR_STREET, ADDR_NOTE,
                    HOURS, LEGAL, PLATFORM, PRICE_INSTALL, PRICE_SUB, PRICE_SUB_YEAR, PRICE_BLOCK,
                    PEGAS, PEGAS_NAME, PEGAS_ESSENCE, FOUNDED_PEGAS, money, sub_text,
                    pre, shell, buttons, cta, faq_html, links_block, org_ld, webpage_ld,
@@ -136,7 +136,10 @@ def page_home(lang="ru"):
 <p class="sub">Ставим GPS-трекеры и подключаем машины к {E(PLATFORM)}: видно, где техника сейчас,
 каким маршрутом она шла вчера, сколько проехала за месяц и не выходила ли за границы объекта.
 Отдельно ставим блокировки двигателя. Установка и обслуживание — в Атырау, у нас в центре.</p>
-{buttons()}
+<div class="row">
+<a class="btn btn-red" href="{(pre(lang) + '/ceny').rstrip('/')}#kalkulyator">Посчитать стоимость</a>
+<a class="btn btn-out" href="{WA}" target="_blank" rel="noopener">{WA_ICO}Написать в WhatsApp</a>
+<a class="btn btn-out" href="tel:{PHONE_HREF}">{PHONE}</a></div>
 <div class="facts">{facts}</div>
 </div></section>
 
