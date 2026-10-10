@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Сборка сайта Bagyt GPS. Запуск: python3 main.py --out ../public"""
+"""Сборка сайта GPS-мониторинга «Пегас Авто А». Запуск: python3 main.py --out ../public"""
 import argparse, json, os, sys
 from build import SITE, LANGS, HL, pre
 from content import page_home
@@ -32,8 +32,8 @@ Sitemap: {SITE}/sitemap.xml
 
 
 MANIFEST = {
-    "name": "Bagyt GPS — GPS-мониторинг транспорта в Атырау",
-    "short_name": "Bagyt GPS",
+    "name": "GPS-мониторинг транспорта в Атырау — Пегас Авто А",
+    "short_name": "Пегас · GPS",
     "start_url": "/",
     "display": "browser",
     "background_color": "#13140e",

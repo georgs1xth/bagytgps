@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Генератор сайта Bagyt GPS — GPS-мониторинг транспорта в Атырау (bagyt.georgiy.bond).
+Генератор сайта GPS-мониторинга транспорта «Пегас Авто А» в Атырау (bagyt.georgiy.bond).
+Отдельного бренда нет (решение Георгия 11.10.2026): сайт — направление «Пегас Авто А»,
+адрес — установочный центр на Курмангазы, 70Б. Домен пока прежний: сменить = поправить SITE.
 Чистый статичный HTML без бэкенда. JS — только калькулятор на /ceny и пауза анимации героя.
 Дизайн — система BAGYT TERMINAL (design-systems/bagyt-gps). Язык: ru (архитектура готова к kk).
 
@@ -15,20 +17,25 @@
 import html, json, re
 
 SITE = "https://bagyt.georgiy.bond"
-BRAND = "Bagyt GPS"
+BRAND = "GPS-мониторинг «Пегас Авто А»"
+LOGO_TEXT = "GPS-отслеживание"
 
 # ── ФАКТЫ (подтверждены Георгием 09.08.2026) ─────────────────────────────────
-PHONE = "+7 702 975 94 80"          # отдельный номер, не совпадает с номером Пегаса
+PHONE = "+7 702 975 94 80"          # отдельный номер по мониторингу, не совпадает с общим номером Пегаса
 PHONE_HREF = "+77029759480"
 WA = "https://wa.me/77029759480"
 
 CITY = "Атырау"
 REGION = "Атырауская область"
-ADDR_STREET = "ул. Бекена Айтжанова, 35"
-ADDR_NOTE = "рядом с баней «Оркен» и балыкшинским мостом"
-GEO = (47.092672, 51.84855)
-HOURS = "Ежедневно 10:00–20:00"
-HOURS_LD = "Mo-Su 10:00-20:00"
+# Адрес, ориентиры, координаты и часы — точка «Пегас Авто А» на Курмангазы, дословно
+# как на pegas.georgiy.bond (generator/build.py, POINTS["kurmangazy"]).
+ADDR_STREET = "ул. Курмангазы, 70Б"
+ADDR_NOTE = "ТД «Диас», задний двор магазина «Москва», рядом с мал базаром «Тума»"
+GEO = (47.114546, 51.885867)
+HOURS = "Ежедневно 09:00–19:00, вечером — по предварительному звонку"
+HOURS_LD = "Mo-Su 09:00-19:00"
+OPENS, CLOSES = "09:00", "19:00"
+GIS = "https://2gis.kz/atyrau/geo/70000001035317367"
 LEGAL = "ИП «JASavto»"
 FOUNDED_PEGAS = 2011
 
@@ -50,7 +57,7 @@ PEGAS_ESSENCE = (
     "установка в собственных установочных центрах."
 )
 # install.georgiy.bond здесь намеренно не упоминается: тот сайт про Астану,
-# а Bagyt GPS работает только в Атырау. Любое упоминание другого города
+# а мониторинг работает только в Атырау. Любое упоминание другого города
 # размывает геопривязку и сбивает ИИ-поиск. Запрет продублирован в check.py.
 
 # Спутниковые кадры: Sentinel-2 L2A, открытые данные Copernicus. Указание источника
@@ -230,19 +237,27 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
 
 /* --- Герой: спутниковый кадр Атырау + слой данных поверх. На телефоне кадр
    стоит блоком сверху, текст под ним; на десктопе кадр на весь герой со скримом. --- */
-.ds-hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border-color)}
-.ds-hero__media{position:absolute;top:0;left:0;right:0;height:360px;pointer-events:none;background:var(--background)}
+.ds-hero{position:relative;overflow:hidden;border-bottom:1px solid var(--border-color);--mh:clamp(430px,64vh,580px)}
+.ds-hero__media{position:absolute;top:0;left:0;right:0;height:var(--mh);overflow:hidden;pointer-events:none;background:var(--background)}
 .ds-hero__media picture{display:contents}
 .ds-hero__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 50%;display:block}
 /* рамка кадра: снимок и слой данных всегда одного размера — так треки не съезжают с улиц.
    На телефоне рамка шире экрана: город крупнее, сцена с машинами в центре кадра. */
 .hero-frame{position:absolute;inset:0}
-@media (max-width:979px){.hero-frame{inset:auto;right:-12px;top:-2%;width:max(100%,760px);height:110%}}
+/* телефон: «камера» — снимок и слой данных двигает скрипт (live.py), без JS — просто снимок */
+@media (max-width:979px){
+  .ds-hero__media:not(.cam) .hero-live{display:none}
+  .ds-hero__media:not(.cam) img{object-position:50% 45%}
+  .cam .hero-frame img{inset:auto;left:0;top:0;max-width:none;object-fit:fill;transform-origin:0 0;will-change:transform}
+  .cam .hero-live{will-change:contents}
+  .cam .ds-hero__scrim{background:linear-gradient(to top,rgba(19,20,14,.94) 0%,rgba(19,20,14,.5) 22%,transparent 40%),
+    linear-gradient(to bottom,rgba(19,20,14,.6) 0%,transparent 16%)}
+}
 .hero-live{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden}
 .hero-live *{vector-effect:non-scaling-stroke}
 .ds-hero__scrim{position:absolute;inset:0;background:linear-gradient(to top,var(--background) 0%,rgba(19,20,14,.6) 22%,transparent 48%)}
 .ds-hero__in{position:relative;width:100%;max-width:var(--page-max-width);margin:0 auto;
-  padding:384px var(--gutter) var(--spacing-59)}
+  padding:calc(var(--mh) + 26px) var(--gutter) var(--spacing-59)}
 .ds-hero h1{margin-bottom:var(--spacing-21)}
 /* Над светлым кадром моно-надзаголовок стоит плашкой канваса, как подписи на карте */
 .ds-hero .ds-eyebrow{display:inline-block;background:var(--background);color:var(--foreground);padding:var(--spacing-5) var(--spacing-7)}
@@ -280,27 +295,57 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
 .car.st-lost .lbl text{fill:var(--status-no-signal)}
 .car .ld{stroke:var(--foreground);stroke-width:1;opacity:.45}
 @media (min-width:980px){.car .lbl,.hero-live .zl{display:inline}}
-.hud,.tick{font-family:var(--mono);font-size:var(--text-caption);line-height:1.35;letter-spacing:0;color:var(--foreground)}
+.hud,.mcard,.mchip{font-family:var(--mono);font-size:var(--text-caption);line-height:1.35;letter-spacing:0;color:var(--foreground)}
 .hud{display:none;background:rgba(19,20,14,.88);border:1px solid var(--border-color);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .hud-h{display:flex;justify-content:space-between;gap:var(--spacing-14);padding:var(--spacing-7) var(--spacing-14);
   border-bottom:1px solid var(--border-color);color:var(--muted-foreground);text-transform:uppercase;letter-spacing:var(--tracking-caps)}
 .hud-h span:last-child{color:var(--foreground);font-variant-numeric:tabular-nums}
 .hud ol{list-style:none;margin:0;padding:var(--spacing-7) 0;min-height:122px}
-.hud li,.tick{display:grid;grid-template-columns:auto 8px 1fr;gap:var(--spacing-7) var(--spacing-14);align-items:center}
+.hud li{display:grid;grid-template-columns:auto 8px 1fr;gap:var(--spacing-7) var(--spacing-14);align-items:center}
 .hud li{padding:var(--spacing-5) var(--spacing-14);margin:0;max-width:none;animation:hud-in var(--duration-ui) var(--ease-ui)}
 .hud li:nth-child(n+2){opacity:.62}
 .hud time{color:var(--muted-foreground);font-variant-numeric:tabular-nums}
-.hud b,.tick b{font-size:1em}
+.hud b,.mcard b{font-size:1em}
 @keyframes hud-in{from{opacity:0;transform:translateY(-4px)}}
-.hud .s,.tick .s{width:8px;height:8px;box-sizing:border-box}
+.hud .s,.mcard .s{display:inline-block;width:8px;height:8px;box-sizing:border-box}
 .s-move{background:var(--status-moving)}.s-idle{border:1px solid var(--status-idle)}
 .s-lost{border:1px dashed var(--status-no-signal)}.s-alert{background:var(--status-alert)}
-.tick{position:absolute;left:var(--gutter);right:var(--gutter);bottom:var(--spacing-14);grid-template-columns:8px 1fr;
-  padding:var(--spacing-7) var(--spacing-14);background:rgba(19,20,14,.88);border:1px solid var(--border-color)}
-.tick:empty{display:none}
+/* телефон: часы сверху, карточка ведомой машины снизу */
+.mchip{position:absolute;left:var(--gutter);top:var(--spacing-14);display:flex;align-items:center;gap:var(--spacing-7);
+  font-size:12px;text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--foreground);
+  padding:var(--spacing-5) var(--spacing-7);background:rgba(19,20,14,.82);border:1px solid var(--border-color)}
+.mchip i{width:7px;height:7px;background:var(--accent)}
+.mchip span:last-child{color:var(--accent);font-variant-numeric:tabular-nums}
+.mcard{position:absolute;left:var(--gutter);right:var(--gutter);bottom:var(--spacing-14);color:var(--foreground);
+  background:rgba(19,20,14,.86);border:1px solid var(--border-color);border-left:2px solid var(--accent);
+  padding:var(--spacing-7) var(--spacing-14) var(--spacing-14);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.mcard:empty{display:none}
+.mcard.st-alert{border-left-color:var(--status-alert)}
+.mcard.st-lost{border-left-color:var(--status-no-signal)}
+.mcard.st-idle{border-left-color:var(--status-idle)}
+.mc-top{display:flex;justify-content:space-between;align-items:center;gap:var(--spacing-14);font-size:13px}
+.mc-top span{display:inline-flex;align-items:center;gap:var(--spacing-7);text-transform:uppercase;letter-spacing:var(--tracking-caps);font-size:12px}
+.st-move .mc-top span{color:var(--status-moving)}.st-alert .mc-top span{color:var(--status-alert)}
+.st-lost .mc-top span{color:var(--status-no-signal)}.st-idle .mc-top span{color:var(--status-idle)}
+.mc-mid{display:grid;grid-template-columns:auto auto 1fr;align-items:baseline;gap:var(--spacing-7);margin-top:var(--spacing-5)}
+.mc-v{font-size:40px;line-height:1;font-weight:300;font-variant-numeric:tabular-nums;letter-spacing:-.02em;min-width:2.1ch}
+.mc-u{font-size:12px;color:var(--muted-foreground);text-transform:uppercase}
+.mc-e{justify-self:end;text-align:right;font-size:12px;color:var(--muted-foreground);line-height:1.3}
+.st-alert .mc-e{color:var(--status-alert)}
+.ret path{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-linecap:square}
+.ret{transition:opacity var(--duration-ui) var(--ease-ui)}
+.ret.al path{stroke:var(--status-alert)}
+.ret.ls path{stroke:var(--status-no-signal);stroke-dasharray:3 2}
+.cpin .pd{fill:var(--accent);stroke:var(--color-obsidian-loam);stroke-width:1}
+.cpin .pr{fill:none;stroke:var(--accent);stroke-width:1;transform-box:fill-box;transform-origin:center}
+.cpin .pp{opacity:0}
+@media (prefers-reduced-motion:no-preference){.cpin .pp{animation:car-ping 2.2s var(--ease-ui) infinite;stroke-width:1.5}}
+.cpin .cl rect{fill:var(--color-obsidian-loam);opacity:.9}
+.cpin .cl text{font-family:var(--mono);font-size:12px;letter-spacing:.06em;fill:var(--accent)}
+.cam .hero-live .zl{display:inline}
 @media (min-width:980px){
-  .tick{display:none}
+  .mcard,.mchip{display:none}
   .ds-hero__in{display:grid;grid-template-columns:minmax(0,620px) minmax(0,1fr);column-gap:var(--spacing-59);align-items:end}
   .hud{display:block;justify-self:end;width:min(100%,380px);margin-bottom:var(--spacing-59)}
   .ds-hero .facts{grid-column:1/-1}
@@ -560,7 +605,7 @@ WA_ICO = ('<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" a
           'l-.4.6-.5.5c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.7 1.6.3.2.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 1'
           'c.3.1.5.2.6.4 0 .1 0 .8-.1 1.4Z"/></svg>')
 
-LOGO_HTML = '<a class="logo" href="{href}">Bagyt GPS<i>·</i>Пегас Авто А</a>'
+LOGO_HTML = '<a class="logo" href="{href}">GPS-отслеживание<i>·</i>Пегас Авто А</a>'
 
 
 # ── Единый каркас страницы ───────────────────────────────────────────────────
@@ -628,7 +673,7 @@ def shell(lang, path, title, desc, body, ld):
 <p><a href="tel:{PHONE_HREF}">{PHONE}</a></p>
 <p><a href="{WA}" target="_blank" rel="noopener">WhatsApp</a></p></div>
 <div><h3>Разделы</h3>{foot_links}</div>
-<div><h3>Смежная компания</h3>
+<div><h3>Компания</h3>
 <p><a href="{PEGAS}" rel="noopener">{PEGAS_NAME} — StarLine в Атырау</a></p>
 <p class="sm">Охранные комплексы, видеорегистраторы и услуги СТО в Атырау.</p></div>
 </div></div></footer>
@@ -681,13 +726,13 @@ def org_ld():
         "@type": ["Organization", "LocalBusiness"],
         "@id": f"{SITE}/#org",
         "name": BRAND,
-        "alternateName": ["Бағыт GPS", "Bagyt GPS Атырау"],
+        "alternateName": ["GPS-мониторинг транспорта в Атырау", "Пегас Авто А — GPS-отслеживание"],
         "legalName": LEGAL,
         "url": SITE + "/",
         "description": (
-            "Bagyt GPS — GPS-мониторинг транспорта в Атырау: подбор и установка GPS-трекеров, "
+            "GPS-мониторинг транспорта в Атырау от «Пегас Авто А»: подбор и установка GPS-трекеров, "
             f"подключение к платформе {PLATFORM}, установка блокировок двигателя, обучение "
-            f"и обслуживание. Направление компании «{PEGAS_NAME}»."),
+            f"и обслуживание в установочном центре на Курмангазы, 70Б."),
         "telephone": PHONE,
         "address": {
             "@type": "PostalAddress",
@@ -701,7 +746,7 @@ def org_ld():
         "openingHoursSpecification": [{
             "@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            "opens": "10:00", "closes": "20:00",
+            "opens": OPENS, "closes": CLOSES,
         }],
         # Связь с «Пегас Авто А» — отдельным полем, а не придаточным оборотом в описании.
         "parentOrganization": {
@@ -724,7 +769,7 @@ def org_ld():
         ],
         "hasOfferCatalog": {
             "@type": "OfferCatalog",
-            "name": "Услуги Bagyt GPS",
+            "name": "Услуги GPS-мониторинга «Пегас Авто А»",
             "itemListElement": [
                 {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Мониторинг транспорта в Атырау"},
                  "url": f"{SITE}/monitoring-transporta-atyrau"},
