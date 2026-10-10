@@ -234,11 +234,15 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
 .ds-hero__media{position:absolute;top:0;left:0;right:0;height:360px;pointer-events:none;background:var(--background)}
 .ds-hero__media picture{display:contents}
 .ds-hero__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 50%;display:block}
-.hero-map{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden}
-.hero-map *{vector-effect:non-scaling-stroke}
+/* рамка кадра: снимок и слой данных всегда одного размера — так треки не съезжают с улиц.
+   На телефоне рамка шире экрана: город крупнее, сцена с машинами в центре кадра. */
+.hero-frame{position:absolute;inset:0}
+@media (max-width:979px){.hero-frame{inset:auto;right:-12px;top:-2%;width:max(100%,760px);height:110%}}
+.hero-live{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:hidden}
+.hero-live *{vector-effect:non-scaling-stroke}
 .ds-hero__scrim{position:absolute;inset:0;background:linear-gradient(to top,var(--background) 0%,rgba(19,20,14,.6) 22%,transparent 48%)}
 .ds-hero__in{position:relative;width:100%;max-width:var(--page-max-width);margin:0 auto;
-  padding:318px var(--gutter) var(--spacing-59)}
+  padding:384px var(--gutter) var(--spacing-59)}
 .ds-hero h1{margin-bottom:var(--spacing-21)}
 /* Над светлым кадром моно-надзаголовок стоит плашкой канваса, как подписи на карте */
 .ds-hero .ds-eyebrow{display:inline-block;background:var(--background);color:var(--foreground);padding:var(--spacing-5) var(--spacing-7)}
@@ -252,19 +256,55 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
   .ds-hero__in{padding-top:var(--spacing-119)}
   .ds-hero h1,.ds-hero .sub{max-width:620px}
 }
-.hero-map .mk{fill:none;stroke-width:8;stroke-linecap:square}
-.hero-map .mk-move{stroke:var(--status-moving)}
-.hero-map .mk-idle{stroke:var(--status-idle)}
-.hero-map .mk-hole{stroke:var(--background);stroke-width:6}
-.hero-map .mk-alert{stroke:var(--status-alert)}
-.hero-map .ds-track-live{stroke-width:2}
-.hero-map .ds-track-history{opacity:.55}
-.hero-map .lb{display:none}
-.hero-map .lb rect{fill:var(--background);opacity:.88}
-.hero-map text{font-family:var(--mono);font-size:14px;letter-spacing:.08em}
-.hero-map .t-zone{fill:var(--accent)}
-.hero-map .t-alert{fill:var(--status-alert)}
-@media (min-width:980px){.hero-map .lb{display:inline}}
+/* Живая диспетчерская поверх кадра (live.py): силуэты машин, треки, подписи, журнал */
+.hero-live .ds-track-live{stroke-width:2.5}
+.hero-live .ds-track-history{stroke-width:2;opacity:.5}
+.hero-live .ds-track-gap{stroke-width:2}
+.hero-live .ds-geofence{transition:fill var(--duration-ui) var(--ease-ui),stroke var(--duration-ui) var(--ease-ui)}
+.hero-live .ds-geofence.hit{stroke:var(--status-alert);fill:rgba(255,92,58,.14)}
+.car .b{fill:var(--status-moving);stroke:var(--color-obsidian-loam);stroke-width:1}
+.car .w{fill:var(--color-obsidian-loam);opacity:.6}
+.car .w.r{opacity:.22}
+.car.st-idle .b{fill:var(--status-idle)}
+.car.st-lost .b{fill:rgba(132,131,123,.35);stroke:var(--foreground);stroke-width:1.2;stroke-dasharray:2.5 2}
+.car.st-lost .w{display:none}
+.car.st-alert .b{fill:var(--status-alert)}
+.car .ping{fill:none;stroke:var(--status-alert);stroke-width:1.5;opacity:0;transform-box:fill-box;transform-origin:center}
+.car.st-alert .ping{animation:car-ping 1.6s var(--ease-ui) infinite}
+@keyframes car-ping{0%{transform:scale(.8);opacity:.9}100%{transform:scale(2.8);opacity:0}}
+.car .lbl,.hero-live .zl{display:none}
+.car .lbl rect,.hero-live .zl rect{fill:var(--color-obsidian-loam);opacity:.9}
+.car .lbl text,.hero-live .zl text{font-family:var(--mono);font-size:12px;letter-spacing:.06em;fill:var(--foreground)}
+.hero-live .zl text{fill:var(--accent)}
+.car.st-alert .lbl text{fill:var(--status-alert)}
+.car.st-lost .lbl text{fill:var(--status-no-signal)}
+.car .ld{stroke:var(--foreground);stroke-width:1;opacity:.45}
+@media (min-width:980px){.car .lbl,.hero-live .zl{display:inline}}
+.hud,.tick{font-family:var(--mono);font-size:var(--text-caption);line-height:1.35;letter-spacing:0;color:var(--foreground)}
+.hud{display:none;background:rgba(19,20,14,.88);border:1px solid var(--border-color);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.hud-h{display:flex;justify-content:space-between;gap:var(--spacing-14);padding:var(--spacing-7) var(--spacing-14);
+  border-bottom:1px solid var(--border-color);color:var(--muted-foreground);text-transform:uppercase;letter-spacing:var(--tracking-caps)}
+.hud-h span:last-child{color:var(--foreground);font-variant-numeric:tabular-nums}
+.hud ol{list-style:none;margin:0;padding:var(--spacing-7) 0;min-height:122px}
+.hud li,.tick{display:grid;grid-template-columns:auto 8px 1fr;gap:var(--spacing-7) var(--spacing-14);align-items:center}
+.hud li{padding:var(--spacing-5) var(--spacing-14);margin:0;max-width:none;animation:hud-in var(--duration-ui) var(--ease-ui)}
+.hud li:nth-child(n+2){opacity:.62}
+.hud time{color:var(--muted-foreground);font-variant-numeric:tabular-nums}
+.hud b,.tick b{font-size:1em}
+@keyframes hud-in{from{opacity:0;transform:translateY(-4px)}}
+.hud .s,.tick .s{width:8px;height:8px;box-sizing:border-box}
+.s-move{background:var(--status-moving)}.s-idle{border:1px solid var(--status-idle)}
+.s-lost{border:1px dashed var(--status-no-signal)}.s-alert{background:var(--status-alert)}
+.tick{position:absolute;left:var(--gutter);right:var(--gutter);bottom:var(--spacing-14);grid-template-columns:8px 1fr;
+  padding:var(--spacing-7) var(--spacing-14);background:rgba(19,20,14,.88);border:1px solid var(--border-color)}
+.tick:empty{display:none}
+@media (min-width:980px){
+  .tick{display:none}
+  .ds-hero__in{display:grid;grid-template-columns:minmax(0,620px) minmax(0,1fr);column-gap:var(--spacing-59);align-items:end}
+  .hud{display:block;justify-self:end;width:min(100%,380px);margin-bottom:var(--spacing-59)}
+  .ds-hero .facts{grid-column:1/-1}
+}
 .sat-credit{color:var(--muted-foreground)}
 
 /* --- Полоса кадра: на всю ширину, без рамок, скрим только под подписью --- */
