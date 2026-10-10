@@ -300,7 +300,18 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .hud-h{display:flex;justify-content:space-between;gap:var(--spacing-14);padding:var(--spacing-7) var(--spacing-14);
   border-bottom:1px solid var(--border-color);color:var(--muted-foreground);text-transform:uppercase;letter-spacing:var(--tracking-caps)}
-.hud-h span:last-child{color:var(--foreground);font-variant-numeric:tabular-nums}
+.hud-h #hclk{color:var(--foreground);font-variant-numeric:tabular-nums}
+.hud-r{display:inline-flex;align-items:center;gap:var(--spacing-14)}
+/* кнопка паузы анимации (WCAG 2.2.2) */
+.hpause{display:inline-flex;align-items:center;gap:var(--spacing-7);font:inherit;font-size:12px;line-height:1;
+  text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--foreground);cursor:pointer;
+  background:transparent;border:1px solid var(--border-color);border-radius:var(--radius-md);padding:5px 7px;
+  pointer-events:auto;transition:border-color var(--duration-micro) var(--ease-ui)}
+.hpause:hover{border-color:var(--accent);color:var(--accent)}
+.ic-pa{width:7px;height:8px;border-left:2px solid currentColor;border-right:2px solid currentColor;box-sizing:border-box}
+.ic-pl{width:0;height:0;border-left:7px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent}
+.hp-m{position:absolute;right:var(--gutter);top:var(--spacing-14);background:rgba(19,20,14,.82);font-family:var(--mono)}
+@media (min-width:980px){.hp-m{display:none}}
 .hud ol{list-style:none;margin:0;padding:var(--spacing-7) 0;min-height:122px}
 .hud li{display:grid;grid-template-columns:auto 8px 1fr;gap:var(--spacing-7) var(--spacing-14);align-items:center}
 .hud li{padding:var(--spacing-5) var(--spacing-14);margin:0;max-width:none;animation:hud-in var(--duration-ui) var(--ease-ui)}
@@ -316,6 +327,7 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
   font-size:12px;text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--foreground);
   padding:var(--spacing-5) var(--spacing-7);background:rgba(19,20,14,.82);border:1px solid var(--border-color)}
 .mchip i{width:7px;height:7px;background:var(--accent)}
+@media (max-width:430px){.mch-t{display:none}}
 .mchip span:last-child{color:var(--accent);font-variant-numeric:tabular-nums}
 .mcard{position:absolute;left:var(--gutter);right:var(--gutter);bottom:var(--spacing-14);color:var(--foreground);
   background:rgba(19,20,14,.86);border:1px solid var(--border-color);border-left:2px solid var(--accent);

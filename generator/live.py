@@ -23,7 +23,13 @@
 
 Тексты событий формируются скриптом и в HTML не попадают: поисковики их не видят.
 Без JS остаются снимок и статичные треки (на телефоне — только снимок).
-Максимум три машины в кадре и reduced-motion — по guidelines.md, «Движение».
+Максимум три машины в кадре — по guidelines.md, «Движение».
+
+prefers-reduced-motion НЕ останавливает машины: Android в режиме энергосбережения
+сам включает этот флаг, и анимация замирала у обычных посетителей (11.10.2026).
+Вместо остановки — спокойный режим: машины едут, камера на телефоне не наезжает
+и не проезжает, а переставляется склейками; пульсаций нет. Для всех есть кнопка
+«Пауза» (WCAG 2.2.2), выбор запоминается.
 """
 import json
 
@@ -78,20 +84,24 @@ def media(alt):
 <g class="static">{static}</g>
 <g id="ht"></g><g id="hc"></g>
 </svg></div>
-<div class="mchip" aria-hidden="true"><i></i><span>Диспетчерская · Атырау</span><span id="mclk">--:--</span></div>
+<div class="mchip" aria-hidden="true"><i></i><span class="mch-t">Диспетчерская ·</span><span>Атырау</span><span id="mclk">--:--</span></div>
+<button type="button" class="hpause hp-m" aria-pressed="false">Пауза</button>
 <div class="mcard" id="mcard" aria-hidden="true"></div>
 </div>"""
 
 
-HUD = ('<div class="hud" aria-hidden="true"><div class="hud-h"><span>Диспетчерская · Атырау</span>'
-       '<span id="hclk">--:--:--</span></div><ol id="hlog"></ol></div>')
+HUD = ('<div class="hud"><div class="hud-h"><span aria-hidden="true">Диспетчерская · Атырау</span>'
+       '<span class="hud-r"><span id="hclk" aria-hidden="true">--:--:--</span>'
+       '<button type="button" class="hpause" aria-pressed="false">Пауза</button></span></div>'
+       '<ol id="hlog" aria-hidden="true"></ol></div>')
 
 
 _JS = r"""
 (function(){
 var svg=document.getElementById("hl");if(!svg||!svg.getBoundingClientRect)return;
 var CFG=__CFG__,NS="http://www.w3.org/2000/svg",D=document,W=window;
-var reduce=W.matchMedia&&W.matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* calm — спокойный режим при prefers-reduced-motion: всё едет, камера без наездов */
+var calm=!!(W.matchMedia&&W.matchMedia("(prefers-reduced-motion: reduce)").matches);
 var mq=W.matchMedia?W.matchMedia("(max-width: 979px)"):null;
 var ACC=26,HIST=520,LIVE=110,k=1,gs=1,cam=false;
 function E(n,a,p){var e=D.createElementNS(NS,n);if(a)for(var q in a)e.setAttribute(q,a[q]);if(p)p.appendChild(e);return e;}
@@ -202,15 +212,23 @@ function want(i,punch){
 function camTarget(){
  if(dir.mode==="over")return[SC[0],SC[1],overW()];
  var o=cars[dir.f];if(o.op<0.35){focusOn((dir.f+1)%cars.length,false);o=cars[dir.f];}
- var p=at(o.r,o.lost?o.gap[0]:o.d),ld=Math.min(34,o.spd*0.85);
- return[p[0]+Math.cos(o.ang)*ld,p[1]+Math.sin(o.ang)*ld,dir.punch>0?210:290];
+ var p=at(o.r,o.lost?o.gap[0]:o.d),ld=Math.min(34,o.spd*0.85),w=calm?290:dir.punch>0?210:290;
+ /* машина держится в видимой части кадра — над карточкой внизу */
+ return[p[0]+Math.cos(o.ang)*ld,p[1]+Math.sin(o.ang)*ld+CARD/2*w/SW,w];
 }
 function camStep(dt,snap){
  dir.t-=dt;dir.since+=dt;if(dir.punch>0)dir.punch-=dt;
  dir.q=dir.q.filter(function(x){x[2]+=dt;return x[2]<7;});
  if(dir.q.length&&(dir.since>=3.4||dir.t<=0)){var n=dir.q.shift();focusOn(n[0],n[1]);}
  else if(dir.t<=0){if(dir.mode==="follow"){dir.mode="over";dir.t=3;}else focusOn((dir.f+1)%cars.length,false);}
- var T=camTarget(),a=snap?1:1-Math.exp(-dt*2.4),az=snap?1:1-Math.exp(-dt*1.7);
+ var T=camTarget();
+ if(calm){ /* склейки: камера стоит, пока машина в кадре, потом переставляется сразу */
+  var tw=Math.min(dir.mode==="over"?T[2]:290,overW()),hh=tw*SHh/SW,key=dir.mode+dir.f,o=cars[dir.f],cx=T[0],cy=T[1];
+  if(dir.mode!=="over"){cx+=Math.cos(o.ang)*tw*0.26;cy+=Math.sin(o.ang)*hh*0.14;}
+  if(snap||dir.cut!==key||Math.abs(T[0]-C.x)>tw*0.42||Math.abs(T[1]-C.y)>hh*0.36){C.x=cx;C.y=cy;C.w=tw;dir.cut=key;}
+  applyCam();return;
+ }
+ var a=snap?1:1-Math.exp(-dt*2.4),az=snap?1:1-Math.exp(-dt*1.7);
  C.x+=(T[0]-C.x)*a;C.y+=(T[1]-C.y)*a;C.w+=(Math.min(T[2],overW())-C.w)*az;
  applyCam();
 }
@@ -231,7 +249,7 @@ function overlays(){
  cbox=[fl?s[0]-14*gs-lw:s[0]+14*gs,s[1]-11*gs,lw,22*gs];
 }
 
-var cw=200,cflip=null;
+var cw=200,cflip=null,CARD=0;
 function setMode(){
  cam=!!(mq&&mq.matches)&&!!media;
  if(media)media.classList.toggle("cam",cam);
@@ -239,6 +257,7 @@ function setMode(){
  zw=Math.round((tw(zt)||90)+16);zl.firstChild.setAttribute("width",String(zw));
  cw=Math.round(tw(clt)||190);clr.setAttribute("width",String(cw+16));
  if(cam){
+  CARD=mcard?(mcard.getBoundingClientRect().height||104)+14:0;
   gs=0.9;svg.setAttribute("preserveAspectRatio","none");
   if(img){img.style.width=R[2]+"px";img.style.height=R[3]+"px";}
   applyCam();
@@ -329,7 +348,7 @@ var lastCard=0;
 function hud(dt){
  if(!cam){ret.style.opacity=0;return;}
  var o=cars[dir.f],show=dir.mode==="follow"&&o.op>0.3;
- lock+=(34-lock)*(1-Math.exp(-dt*7));
+ lock=calm?34:lock+(34-lock)*(1-Math.exp(-dt*7));
  ret.style.opacity=show?1:0;ret.setAttribute("class","ret"+(o.state==="alert"?" al":o.state==="lost"?" ls":""));
  if(o.pt){var s=lock/2,a=Math.min(9,s*0.45),dd=[[-1,-1],[1,-1],[1,1],[-1,1]];
   for(var i=0;i<4;i++){var x=dd[i][0]*s,y=dd[i][1]*s;
@@ -354,21 +373,26 @@ setMode();
 var rt;W.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){setMode();frameOnce(0);},120);});
 function frameOnce(dt){for(var i=0;i<cars.length;i++){cars[i].dt=dt;draw(cars[i]);}if(cam)camStep(dt,dt===0);layout();hud(dt||0.016);}
 
-if(reduce){ /* без движения: прокручиваем сценарий вперёд и рисуем один кадр */
- var i,t;for(t=0;t<15;t+=1/30)for(i=0;i<cars.length;i++){cars[i].dt=1/30;step(cars[i],1/30);}
- if(cam){focusOn(2,false);dir.t=1e9;lock=34;}
- frameOnce(0);tickClock();setInterval(tickClock,1000);return;
-}
 
 var run=true,raf=0,last=0;
 function frame(ts){
  if(!run){raf=0;return;}
- var dt=last?Math.min(0.05,(ts-last)/1000):0.016;last=ts;
+ /* в энергосбережении кадров бывает 30 и меньше: шаг по реальному времени, с потолком */
+ var dt=last?Math.min(0.1,(ts-last)/1000):0.016;last=ts;
  for(var i=0;i<cars.length;i++){cars[i].dt=dt;step(cars[i],dt);draw(cars[i]);}
  if(cam)camStep(dt);layout();hud(dt);
  raf=requestAnimationFrame(frame);
 }
-function go(on){run=on&&!D.hidden;if(run&&!raf){last=0;raf=requestAnimationFrame(frame);}}
+/* пауза: кнопка в журнале (компьютер) и на карте (телефон), выбор запоминается */
+var paused=false;try{paused=localStorage.getItem("hero-pause")==="1";}catch(e){}
+var btns=[].slice.call(D.querySelectorAll(".hpause"));
+function setBtn(){btns.forEach(function(b){b.setAttribute("aria-pressed",paused?"true":"false");
+ b.setAttribute("aria-label",paused?"Запустить движение на карте":"Остановить движение на карте");
+ b.innerHTML=(paused?'<i class="ic-pl"></i>Пуск':'<i class="ic-pa"></i>Пауза');});}
+btns.forEach(function(b){b.addEventListener("click",function(){paused=!paused;
+ try{localStorage.setItem("hero-pause",paused?"1":"0");}catch(e){}setBtn();go(vis);});});
+setBtn();
+function go(on){run=on&&!D.hidden&&!paused;if(run&&!raf){last=0;raf=requestAnimationFrame(frame);}}
 var hero=svg.closest?svg.closest(".ds-hero"):null,vis=true;
 if(hero&&"IntersectionObserver" in W){new IntersectionObserver(function(e){vis=e[0].isIntersecting;go(vis);}).observe(hero);}
 D.addEventListener("visibilitychange",function(){go(vis);});
