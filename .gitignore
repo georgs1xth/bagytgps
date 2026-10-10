@@ -8,3 +8,9 @@ README.md
 HANDOUT.md
 PLAN-BAGYT-GPS.md
 NALOGI-BAGYT-GPS.md
+FINANSY-SVODKA.md
+GOSPODDERZHKA-BAGYT-GPS.md
+GOSPODDERZHKA-PEGAS.md
+
+# исходники Sentinel-2 (6,7 МБ); на сайт идут только обработанные кадры из public/img
+sentinel-src/

@@ -110,6 +110,67 @@ FAQ = [
 ]
 
 
+# ── Медиаслой героя ──────────────────────────────────────────────────────────
+# Фотографический слой — реальный снимок Атырау: Sentinel-2 L2A, 22.08.2026,
+# true color, обработка в satellite.py. Поверх — слой данных системы (геозона,
+# треки, разрыв связи, маркеры), зарегистрированный по пикселям кадра:
+# viewBox SVG = 1600×1000, как у снимка, и оба прижаты вправо (object-position 100%
+# и xMaxYMid slice) — поэтому линии лежат на настоящих улицах при любой ширине экрана.
+#   V1 — по широтной улице через мост над Уралом (y≈351);
+#   V2 — вдоль диагонали у железной дороги, с разрывом связи;
+#   геозона — промзона у развязки, из неё выезжает машина с тревогой.
+# Маркеры — нулевые отрезки с квадратным концом и non-scaling-stroke: на любом
+# масштабе это квадрат 8 px, как в дизайн-системе.
+P_V1 = "M960,352 L1185,351 L1420,349"
+P_V2 = "M1500,366 L1300,511"
+P_OUT = "M1470,345 L1450,232"
+
+SAT_ALT = "Атырау и река Урал со спутника: снимок Sentinel-2, 22 августа 2026 года"
+
+HERO_MEDIA = f"""<div class="ds-hero__media">
+<picture><source type="image/avif" srcset="/img/atyrau-city.avif">
+<img src="/img/atyrau-city.webp" width="1600" height="1000" alt="{SAT_ALT}" loading="eager" fetchpriority="high" decoding="async"></picture>
+<svg class="hero-map" viewBox="0 0 1600 1000" preserveAspectRatio="xMaxYMid slice" aria-hidden="true" focusable="false">
+<polygon class="ds-geofence" points="1400,310 1530,262 1570,372 1445,425"/>
+<path class="ds-track-history" d="M880,353 L960,352"/>
+<path class="ds-track-live" d="{P_V1}"/>
+<path class="ds-track-history" d="M1600,292 L1560,322"/>
+<path class="ds-track-gap" d="M1560,322 L1500,366"/>
+<path class="ds-track-live" d="{P_V2}"/>
+<path class="ds-track-live" d="{P_OUT}"/>
+<path class="mk mk-idle" d="M1490,340h0"/><path class="mk mk-hole" d="M1490,340h0"/>
+<path class="mk mk-alert" d="M1450,232h0"/>
+<path class="mk mk-move ds-vehicle" d="M0,0h0" style="--path:path('{P_V1}')"/>
+<path class="mk mk-move ds-vehicle" d="M0,0h0" style="--path:path('{P_V2}');animation-duration:19s;animation-delay:-7s"/>
+<g class="lb"><rect x="1452" y="432" width="88" height="26"/><text class="t-zone" x="1460" y="450">ГЕОЗОНА</text></g>
+<g class="lb"><rect x="1262" y="218" width="174" height="28"/><text class="t-alert" x="1428" y="237" text-anchor="end">ВЫЕЗД ЗА ГЕОЗОНУ</text></g>
+</svg>
+<div class="ds-hero__scrim"></div>
+</div>"""
+
+# Полоса кадра в середине страницы: устье Урала и берег Каспия, тот же день съёмки.
+BAND = """<figure class="ds-image-band">
+<picture><source type="image/avif" srcset="/img/atyrau-delta.avif">
+<img src="/img/atyrau-delta.webp" width="1600" height="800" loading="lazy" decoding="async"
+alt="Устье Урала и берег Каспийского моря южнее Атырау: снимок Sentinel-2, 22 августа 2026 года"></picture>
+<div class="ds-image-band__scrim"></div>
+<figcaption class="ds-image-band__text"><span class="ds-eyebrow">Устье Урала · Каспий · Sentinel-2, 22.08.2026</span></figcaption>
+</figure>"""
+
+# Анимация гасится, когда герой ушёл из вьюпорта (guidelines.md, «Движение»).
+HERO_JS = ('<script>(function(){var h=document.querySelector(".ds-hero");'
+           'if(!h||!("IntersectionObserver" in window))return;'
+           'new IntersectionObserver(function(e){h.classList.toggle("off",!e[0].isIntersecting)}).observe(h)})();</script>')
+
+# Легенда статусов: цвет никогда не единственный носитель состояния —
+# всегда плюс форма (заливка, контур, пунктир) и моно-подпись.
+LEGEND = ('<div class="legend">'
+          '<span class="ds-status ds-status--moving">в движении</span>'
+          '<span class="ds-status ds-status--idle">стоит</span>'
+          '<span class="ds-status ds-status--no-signal">нет связи</span>'
+          '<span class="ds-status ds-status--alert">выезд за геозону</span></div>')
+
+
 def page_home(lang="ru"):
     url = SITE + (pre(lang) or "/")
 
@@ -124,24 +185,27 @@ def page_home(lang="ru"):
 
     what = "".join(f'<div class="card"><h3>{E(t)}</h3><p>{E(d)}</p></div>' for t, d in WHAT)
     seg = "".join(f'<div class="card"><h3>{E(t)}</h3><p>{E(d)}</p>'
-                  f'<p style="margin-top:8px"><a href="{(pre(lang) + p).rstrip("/")}">Подробнее</a></p></div>'
+                  f'<p class="more"><a href="{(pre(lang) + p).rstrip("/")}">Подробнее</a></p></div>'
                   for p, t, d in SEGMENTS)
     steps = "".join(f'<div class="step"><b>{E(t)}</b><p>{E(d)}</p></div>' for t, d in STEPS)
     block = "".join(f'<div class="card"><h3>{E(t)}</h3><p>{E(d)}</p></div>' for t, d in BLOCK)
 
     body = f"""
-<section class="hero"><div class="hero-in">
-<p class="kicker">{E(CITY)} · {E(REGION)} · направление «{E(PEGAS_NAME)}»</p>
+<section class="ds-hero">
+{HERO_MEDIA}
+<div class="ds-hero__in">
+<p class="ds-eyebrow">{E(CITY)} · {E(REGION)} · направление «{E(PEGAS_NAME)}»</p>
 <h1>GPS-мониторинг <span>транспорта</span> в Атырау</h1>
 <p class="sub">Ставим GPS-трекеры и подключаем машины к {E(PLATFORM)}: видно, где техника сейчас,
 каким маршрутом она шла вчера, сколько проехала за месяц и не выходила ли за границы объекта.
 Отдельно ставим блокировки двигателя. Установка и обслуживание — в Атырау, у нас в центре.</p>
 <div class="row">
-<a class="btn btn-red" href="{(pre(lang) + '/ceny').rstrip('/')}#kalkulyator">Посчитать стоимость</a>
-<a class="btn btn-out" href="{WA}" target="_blank" rel="noopener">{WA_ICO}Написать в WhatsApp</a>
-<a class="btn btn-out" href="tel:{PHONE_HREF}">{PHONE}</a></div>
+<a class="ds-btn-lime" href="{(pre(lang) + '/ceny').rstrip('/')}#kalkulyator">Посчитать стоимость</a>
+<a class="ds-btn-ghost" href="{WA}" target="_blank" rel="noopener">{WA_ICO}Написать в WhatsApp</a>
+<a class="ds-btn-ghost" href="tel:{PHONE_HREF}">{PHONE}</a></div>
 <div class="facts">{facts}</div>
 </div></section>
+{HERO_JS}
 
 <div class="wrap">
 
@@ -154,6 +218,7 @@ def page_home(lang="ru"):
 за абонентскую плату.</p>
 
 <h2>Что вы видите в системе</h2>
+{LEGEND}
 <div class="grid c3">{what}</div>
 
 <h2>Блокировка двигателя</h2>
@@ -167,6 +232,8 @@ def page_home(lang="ru"):
 
 <div class="note"><p>Мы описываем только то, что делаем на самом деле. Если вам нужна задача
 сложнее — например, контроль уровня топлива — напишите, обсудим отдельно.</p></div>
+
+{BAND}
 
 <h2>Кому это нужно</h2>
 <div class="grid c3">{seg}</div>

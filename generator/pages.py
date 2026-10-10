@@ -395,7 +395,7 @@ def calculator():
 <h3>Калькулятор стоимости</h3>
 
 <div class="fld">
-<label for="cq" style="font-weight:700;display:block;margin-bottom:8px">Сколько у вас машин</label>
+<label for="cq" class="fl">Сколько у вас машин</label>
 <div class="qty">
 <input type="number" id="cq" min="1" max="100" step="1" value="5" aria-label="Количество машин">
 <input type="range" id="cr" min="1" max="100" step="1" value="5" aria-label="Количество машин, ползунок">
@@ -403,7 +403,7 @@ def calculator():
 </div>
 
 <div class="fld">
-<span style="font-weight:700;display:block;margin-bottom:8px">Как платите</span>
+<span class="fl">Как платите</span>
 <div class="tar">
 <label><input type="radio" name="ct" value="month" checked><span>
   <b>Ежемесячно</b><em>%(iu)s за машину при установке, дальше %(sm)s в месяц</em></span></label>
@@ -413,7 +413,7 @@ def calculator():
 </div>
 
 <div class="fld">
-<span style="font-weight:700;display:block;margin-bottom:8px">Дополнительно</span>
+<span class="fl">Дополнительно</span>
 <label class="add"><input type="checkbox" id="cb"><b>Блокировка двигателя, от %(pb)s за машину</b>
 <em>Ставится вместе с трекером, платится один раз. Команда подаётся из системы мониторинга;
 срабатывает только на стоящей машине.</em></label>
@@ -430,13 +430,13 @@ def calculator():
 <figcaption>Сколько денег уйдёт нарастающим итогом за первый год</figcaption>
 <svg id="cc" viewBox="0 0 640 260" role="img" aria-label="График расходов за первый год"></svg>
 <div class="lg">
-<span><i style="background:#e30016"></i><b id="lg1">Ваш вариант</b></span>
-<span><i style="background:#9a9a9a"></i>Второй наш тариф</span>
-<span><i style="background:#101010"></i>Типичная цена по рынку</span>
+<span><i class="k-k"></i><b id="lg1">Ваш вариант</b></span>
+<span><i class="k-o"></i>Второй наш тариф</span>
+<span><i class="k-m"></i>Типичная цена по рынку</span>
 </div>
 </figure>
 
-<p class="sm mut" style="margin:14px 0 0">Расчёт предварительный и офертой не является: итог зависит
+<p class="sm disc">Расчёт предварительный и офертой не является: итог зависит
 от типа техники и условий монтажа. Для сравнения взято реальное предложение другого подрядчика
 в Атырау, %(md)s — %(mi)s за установку и %(ms)s в месяц за машину, блокировка у них %(mb)s. Точную сумму по вашему парку
 называем до начала работ.</p>
@@ -472,17 +472,18 @@ def calculator():
       o=[],g,y;
   el.setAttribute("viewBox","0 0 "+W+" "+H);
   for(g=0;g<=gl;g++){y=TP+ph-ph*g/gl;
-   o.push('<line x1="'+L+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'" stroke="#e6e6e6"/>');
+   o.push('<line class="g" x1="'+L+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'"/>');
    // На узком экране подпись ставим НАД линией слева, иначе поле под неё съедает треть графика.
    o.push(nar
-     ? '<text x="0" y="'+(y-5).toFixed(1)+'" font-size="11" fill="#6f6f6f">'+lab(max*g/gl)+'</text>'
-     : '<text x="'+(L-8)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="#6f6f6f">'+lab(max*g/gl)+'</text>');}
+     ? '<text x="0" y="'+(y-5).toFixed(1)+'">'+lab(max*g/gl)+'</text>'
+     : '<text x="'+(L-8)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end">'+lab(max*g/gl)+'</text>');}
   for(g=0;g<=12;g+=xs){o.push('<text x="'+X(g).toFixed(1)+'" y="'+(H-7)+'" text-anchor="'+
-    (g===0?"start":g===12?"end":"middle")+'" font-size="11" fill="#6f6f6f">'+(g?g+'\u00a0мес':'старт')+'</text>');}
-  o.push('<path d="'+pa(M,xm)+'" fill="none" stroke="#101010" stroke-width="2" stroke-dasharray="5 4"/>');
-  ser.forEach(function(s){if(s[0]!==k){o.push('<path d="'+pa(s[1],xb)+'" fill="none" stroke="#9a9a9a" stroke-width="1.5"/>');}});
-  o.push('<path d="'+pa(T[k],xb)+'" fill="none" stroke="#e30016" stroke-width="3"/>');
-  o.push('<circle cx="'+X(12).toFixed(1)+'" cy="'+Y(cum(T[k],n,12,xb)).toFixed(1)+'" r="4.5" fill="#e30016"/>');
+    (g===0?"start":g===12?"end":"middle")+'">'+(g?g+'\u00a0мес':'старт')+'</text>');}
+  o.push('<path class="s-m" d="'+pa(M,xm)+'"/>');
+  ser.forEach(function(s){if(s[0]!==k){o.push('<path class="s-o" d="'+pa(s[1],xb)+'"/>');}});
+  o.push('<path class="s-k" d="'+pa(T[k],xb)+'"/>');
+  // Конечная точка — квадрат 8px, как маркер трека в дизайн-системе.
+  o.push('<rect class="pt" x="'+(X(12)-4).toFixed(1)+'" y="'+(Y(cum(T[k],n,12,xb))-4).toFixed(1)+'" width="8" height="8"/>');
   el.innerHTML=o.join("");
  }
  function upd(){

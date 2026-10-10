@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Bagyt GPS">
   <title>Bagyt GPS</title>
-  <rect width="64" height="64" fill="#101010"/>
-  <rect width="64" height="4.8" fill="#e30016"/>
-  <g fill="#e30016">
+  <rect width="64" height="64" fill="#13140e"/>
+  <g fill="#ebfc72">
     <path d="M57.6 7.64 6.4 28.9l23.74 3.72z"/>
     <path d="M57.6 7.64 30.14 32.62l3.72 23.74z"/>
   </g>
-  <path d="M30.14 32.62 33.86 56.36 39.35 25.18z" fill="#101010"/>
+  <path d="M30.14 32.62 33.86 56.36 39.35 25.18z" fill="#13140e"/>
 </svg>

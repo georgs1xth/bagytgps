@@ -11,8 +11,9 @@
 import argparse, os
 from PIL import Image, ImageDraw
 
-RED = (227, 0, 22, 255)
-DARK = (16, 16, 16, 255)
+# BAGYT TERMINAL: лаймовая стрелка на канвасе obsidian-loam. Красный Пегаса ушёл целиком.
+LIME = (235, 252, 114, 255)
+DARK = (19, 20, 14, 255)
 
 # Силуэт стрелки-курсора в произвольной системе координат: острие сверху справа,
 # «хвост» слева, вырез снизу. Ровно тот же контур, что и в favicon.svg.
@@ -37,23 +38,18 @@ def _fit(points, s, fill=0.80):
     return lambda p: (p[0] * k + dx, p[1] * k + dy)
 
 
-def draw_icon(size, bg=DARK, fill=0.80, stripe=True):
+def draw_icon(size, bg=DARK, fill=0.80):
     """Рисуем в 8× и уменьшаем — так края получаются сглаженными."""
     s = size * 8
     im = Image.new("RGBA", (s, s), bg)
     d = ImageDraw.Draw(im)
 
-    # Фирменная красная полоса сверху, как border-top у шапки сайта.
-    # В 16×16 она съедает шестую часть высоты и мешает стрелке — там её нет.
-    if stripe and size >= 32:
-        d.rectangle([0, 0, s, max(1, int(s * 0.075))], fill=RED)
-
     pt = _fit(ARROW + [NOTCH], s, fill)
 
     # Две половины стрелки плюс тёмный клин между ними: именно вырез
     # превращает треугольник в узнаваемый курсор навигатора.
-    d.polygon([pt(TIP), pt(TAIL_L), pt(ELBOW)], fill=RED)
-    d.polygon([pt(TIP), pt(ELBOW), pt(TAIL_B)], fill=RED)
+    d.polygon([pt(TIP), pt(TAIL_L), pt(ELBOW)], fill=LIME)
+    d.polygon([pt(TIP), pt(ELBOW), pt(TAIL_B)], fill=LIME)
     d.polygon([pt(ELBOW), pt(TAIL_B), pt(NOTCH)], fill=bg)
 
     return im.resize((size, size), Image.LANCZOS)
