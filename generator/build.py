@@ -697,7 +697,8 @@ def org_ld():
                 {"@type": "Offer", "itemOffered": {
                     "@type": "Service", "name": "Установка блокировки двигателя",
                     "description": "Дистанционная блокировка двигателя по команде из системы "
-                                   "мониторинга. Срабатывает только на стоящей машине."},
+                                   "мониторинга. Срабатывает сразу после команды, включать "
+                                   "рекомендуется на стоящей машине."},
                  "priceCurrency": "KZT",
                  "priceSpecification": {"@type": "PriceSpecification", "priceCurrency": "KZT",
                                         "minPrice": PRICE_BLOCK, "valueAddedTaxIncluded": True},
