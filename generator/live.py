@@ -90,7 +90,7 @@ def media(alt):
 </div>"""
 
 
-HUD = ('<div class="hud"><div class="hud-h"><span aria-hidden="true">Диспетчерская · Атырау</span>'
+HUD = ('<div class="hud"><div class="hud-h"><span aria-hidden="true">Диспетчерская</span>'
        '<span class="hud-r"><span id="hclk" aria-hidden="true">--:--:--</span>'
        '<button type="button" class="hpause" aria-pressed="false">Пауза</button></span></div>'
        '<ol id="hlog" aria-hidden="true"></ol></div>')
@@ -187,7 +187,7 @@ function now(sec){var s=new Date(Date.now()+5*36e5).toISOString().substr(11,8);r
 function ev(o,txt,s,focus){
  var li=D.createElement("li");
  li.innerHTML='<time>'+now()+'</time><i class="s s-'+s+'"></i><span><b>'+o.c.id+'</b> '+txt+'</span>';
- if(log){log.insertBefore(li,log.firstChild);while(log.children.length>4)log.removeChild(log.lastChild);}
+ if(log){log.insertBefore(li,log.firstChild);while(log.children.length>2)log.removeChild(log.lastChild);}
  o.ev=now()+" · "+txt;
  if(cam&&focus){if(focus===3)focusOn(o.ix,true);else want(o.ix,focus===2);}
 }
@@ -212,7 +212,8 @@ function want(i,punch){
 function camTarget(){
  if(dir.mode==="over")return[SC[0],SC[1],overW()];
  var o=cars[dir.f];if(o.op<0.35){focusOn((dir.f+1)%cars.length,false);o=cars[dir.f];}
- var p=at(o.r,o.lost?o.gap[0]:o.d),ld=Math.min(34,o.spd*0.85),w=calm?290:dir.punch>0?210:290;
+ /* масштаб держим около 1,2 экранного px на пиксель снимка, иначе на планшете кадр мылится */
+ var p=at(o.r,o.lost?o.gap[0]:o.d),ld=Math.min(34,o.spd*0.85),base=Math.max(290,SW/1.3),w=calm?base:dir.punch>0?Math.max(210,SW/1.75):base;
  /* машина держится в видимой части кадра — над карточкой внизу */
  return[p[0]+Math.cos(o.ang)*ld,p[1]+Math.sin(o.ang)*ld+CARD/2*w/SW,w];
 }
@@ -223,7 +224,7 @@ function camStep(dt,snap){
  else if(dir.t<=0){if(dir.mode==="follow"){dir.mode="over";dir.t=3;}else focusOn((dir.f+1)%cars.length,false);}
  var T=camTarget();
  if(calm){ /* склейки: камера стоит, пока машина в кадре, потом переставляется сразу */
-  var tw=Math.min(dir.mode==="over"?T[2]:290,overW()),hh=tw*SHh/SW,key=dir.mode+dir.f,o=cars[dir.f],cx=T[0],cy=T[1];
+  var tw=Math.min(T[2],overW()),hh=tw*SHh/SW,key=dir.mode+dir.f,o=cars[dir.f],cx=T[0],cy=T[1];
   if(dir.mode!=="over"){cx+=Math.cos(o.ang)*tw*0.26;cy+=Math.sin(o.ang)*hh*0.14;}
   if(snap||dir.cut!==key||Math.abs(T[0]-C.x)>tw*0.42||Math.abs(T[1]-C.y)>hh*0.36){C.x=cx;C.y=cy;C.w=tw;dir.cut=key;}
   applyCam();return;

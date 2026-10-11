@@ -15,6 +15,7 @@
 Никаких выдуманных цифр: всё, что здесь написано, подтверждено Георгием 09.08.2026.
 """
 import html, json, re
+from urllib.parse import quote
 
 SITE = "https://bagyt.georgiy.bond"
 BRAND = "GPS-мониторинг «Пегас Авто А»"
@@ -24,6 +25,9 @@ LOGO_TEXT = "GPS-отслеживание"
 PHONE = "+7 702 975 94 80"          # отдельный номер по мониторингу, не совпадает с общим номером Пегаса
 PHONE_HREF = "+77029759480"
 WA = "https://wa.me/77029759480"
+# Кнопки заявок открывают WhatsApp с готовым началом сообщения: клиенту не нужно
+# думать, что писать, а нам сразу видно, что это заявка с сайта и сколько машин.
+WA_LEAD = WA + "?text=" + quote("Здравствуйте! Хочу подключить GPS-мониторинг. Машин: ")
 
 CITY = "Атырау"
 REGION = "Атырауская область"
@@ -106,7 +110,7 @@ def sub_text(short=False):
 NAV = [
     ("/", "Главная"),
     ("/monitoring-transporta-atyrau", "Мониторинг"),
-    ("/wialon-atyrau", "Wialon"),
+    ("/ustanovka-gps-trekera-atyrau", "Установка"),
     ("/ceny", "Цены"),
     ("/kontakty", "Контакты"),
 ]
@@ -116,7 +120,7 @@ FOOT_NAV = [
     ("/monitoring-spectehniki-atyrau", "Мониторинг спецтехники"),
     ("/gps-dlya-taksi-i-dostavki-atyrau", "GPS для такси и доставки"),
     ("/ustanovka-gps-trekera-atyrau", "Установка GPS-трекера"),
-    ("/wialon-atyrau", "Платформа Wialon"),
+    ("/wialon-atyrau", "Система мониторинга"),
     ("/ceny", "Цены"),
     ("/kontakty", "Контакты"),
 ]
@@ -312,7 +316,8 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
 .ic-pl{width:0;height:0;border-left:7px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent}
 .hp-m{position:absolute;right:var(--gutter);top:var(--spacing-14);background:rgba(19,20,14,.82);font-family:var(--mono)}
 @media (min-width:980px){.hp-m{display:none}}
-.hud ol{list-style:none;margin:0;padding:var(--spacing-7) 0;min-height:122px}
+/* журнал на два события: без подзаголовка герой ниже, и выше журнал наезжал бы на сцену */
+.hud ol{list-style:none;margin:0;padding:var(--spacing-7) 0;min-height:70px}
 .hud li{display:grid;grid-template-columns:auto 8px 1fr;gap:var(--spacing-7) var(--spacing-14);align-items:center}
 .hud li{padding:var(--spacing-5) var(--spacing-14);margin:0;max-width:none;animation:hud-in var(--duration-ui) var(--ease-ui)}
 .hud li:nth-child(n+2){opacity:.62}
@@ -403,7 +408,7 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
 
 /* --- Карточки и сетки --- */
 .grid{display:grid;gap:var(--spacing-18);grid-template-columns:1fr;margin:var(--spacing-29) 0;counter-reset:c}
-@media (min-width:700px){.grid.c2,.grid.c3{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:700px){.grid.c2,.grid.c3,.grid.c4{grid-template-columns:repeat(2,1fr)}}
 @media (min-width:980px){.grid.c3{grid-template-columns:repeat(3,1fr)}.grid.c4{grid-template-columns:repeat(4,1fr)}}
 .card{counter-increment:c;background:var(--background);border:1px solid var(--border-color);
   padding:var(--spacing-21) var(--spacing-21) var(--spacing-29)}
@@ -416,6 +421,11 @@ main a.ds-btn-ghost[href^="tel:"],main a.ds-btn-ghost[href*="wa.me"]{color:var(-
   letter-spacing:var(--tracking-caps);text-decoration:none}
 .card p.more a::after{content:" \\2192"}
 .card p.more a:hover{color:var(--accent-hover)}
+p.more-l a{color:var(--accent);font-family:var(--mono);font-size:var(--text-ui);text-transform:uppercase;
+  letter-spacing:var(--tracking-caps);text-decoration:none}
+p.more-l a::after{content:" \\2192"}
+.tw-s table{min-width:0}
+.tw-s td:first-child{padding-right:var(--spacing-14)}
 
 /* --- Шаги: 1px контур, номер 01/02 лаймом --- */
 .steps{counter-reset:s;display:grid;gap:var(--spacing-18);grid-template-columns:1fr;margin:var(--spacing-29) 0}
@@ -689,7 +699,7 @@ def shell(lang, path, title, desc, body, ld):
 <p><a href="{PEGAS}" rel="noopener">{PEGAS_NAME} — StarLine в Атырау</a></p>
 <p class="sm">Охранные комплексы, видеорегистраторы и услуги СТО в Атырау.</p></div>
 </div></div></footer>
-<a class="ds-fab" href="{WA}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">{WA_ICO}</a>
+<a class="ds-fab" href="{WA_LEAD}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">{WA_ICO}</a>
 <script>addEventListener("beforeprint",function(){{[].forEach.call(document.querySelectorAll("details"),function(d){{d.open=true}})}})</script>
 </body>
 </html>"""
@@ -700,7 +710,7 @@ def shell(lang, path, title, desc, body, ld):
 # ── Блоки-конструкторы ───────────────────────────────────────────────────────
 def buttons():
     return (f'<div class="row">'
-            f'<a class="ds-btn-lime" href="{WA}" target="_blank" rel="noopener">{WA_ICO}Написать в WhatsApp</a>'
+            f'<a class="ds-btn-lime" href="{WA_LEAD}" target="_blank" rel="noopener">{WA_ICO}Написать в WhatsApp</a>'
             f'<a class="ds-btn-ghost" href="tel:{PHONE_HREF}">{PHONE}</a></div>')
 
 
@@ -743,7 +753,7 @@ def org_ld():
         "url": SITE + "/",
         "description": (
             "GPS-мониторинг транспорта в Атырау от «Пегас Авто А»: подбор и установка GPS-трекеров, "
-            f"подключение к платформе {PLATFORM}, установка блокировок двигателя, обучение "
+            f"подключение к платформе {PLATFORM}, установка блокировок двигателя, настройка, поддержка "
             f"и обслуживание в установочном центре на Курмангазы, 70Б."),
         "telephone": PHONE,
         "address": {
