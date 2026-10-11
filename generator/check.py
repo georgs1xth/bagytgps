@@ -10,7 +10,7 @@
 import argparse, glob, json, os, re, sys
 from collections import Counter
 
-SITE = "https://bagyt.georgiy.bond"
+SITE = "https://bagytgps.georgiy.bond"
 REQUIRED_HREFLANG = ("ru-KZ", "x-default")   # добавить "kk-KZ" вместе с казахской версией
 
 # ── §7. Жёсткие запреты ──────────────────────────────────────────────────────

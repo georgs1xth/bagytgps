@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bagyt.georgiy.bond/sitemap.xml
+Sitemap: https://bagytgps.georgiy.bond/sitemap.xml
