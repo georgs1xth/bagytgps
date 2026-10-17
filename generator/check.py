@@ -10,7 +10,7 @@
 import argparse, glob, json, os, re, sys
 from collections import Counter
 
-SITE = "https://bagytgps.georgiy.bond"
+SITE = "https://gps.georgiy.bond"
 REQUIRED_HREFLANG = ("ru-KZ", "x-default")   # добавить "kk-KZ" вместе с казахской версией
 
 # ── §7. Жёсткие запреты ──────────────────────────────────────────────────────
@@ -199,9 +199,11 @@ def check(root):
             err(url, "в логотип перенесена фирменная раскраска Пегаса — так нельзя")
 
         # --- бренда Bagyt GPS больше нет (11.10.2026): сайт — направление «Пегас Авто А».
-        #     Проверка с учётом регистра: строчное «bagyt» в домене пока допустимо.
         if re.search(r"Bagyt|Бағыт", text):
             err(url, "осталось старое название «Bagyt GPS» — бренда больше нет")
+        # --- домен с 17.10.2026 — gps.georgiy.bond; старые bagyt./bagytgps. не используются
+        if re.search(r"bagyt(gps)?\.georgiy\.bond", s):
+            err(url, "ссылка на старый домен bagyt/bagytgps — должен быть gps.georgiy.bond")
 
     # --- дубликаты
     for name, counter in (("title", titles), ("description", descs), ("canonical", canons)):
